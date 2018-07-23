@@ -1,0 +1,129 @@
+<resources>
+    <string name="app_name">江苏瑞安</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="fuel_ga">注:
+二级耐火等级建筑：主要建筑构件除吊顶为难燃烧性，其他为不燃烧性；
+检查情况在方框中打勾；
+照片拍摄要求(工商营业执照、餐饮服务许可证、灶具及相关附件、减压阀及软管接口、气瓶间内外)；
+间距和高度预估数据备注在备注栏；</string>
+    <string name="picked_date_format">%1$d-%2$d-%3$d</string>
+    <string-array name="spingarrzy">
+        <item>请选择</item>
+        <item>金属非金属矿山</item>
+        <item>陆上石油天然气</item>
+        <item>海洋石油天然气</item>
+        <item>选矿场</item>
+        <item>尾矿库</item>
+        <item>采掘施工单位</item>
+        <item>地质勘察单位</item>
+        <item>危险化学品</item>
+        <item>化工</item>
+        <item>医疗</item>
+        <item>烟花爆竹</item>
+        <item>炼金</item>
+        <item>有色</item>
+        <item>建材</item>
+        <item>机械</item>
+        <item>轻工</item>
+        <item>纺织</item>
+        <item>烟草</item>
+        <item>餐饮</item>
+        <item>其他</item>
+    </string-array>
+    <string-array name="spingarrdj">
+        <item>一级</item>
+        <item>二级</item>
+        <item>三级</item>
+        <item>其他</item>
+    </string-array>
+    <string-array name="spingarrsg">
+        <item>请选择</item>
+        <item>物体打击</item>
+        <item>车辆伤害</item>
+        <item>机械伤害</item>
+        <item>起重伤害</item>
+        <item>触电</item>
+        <item>淹溺</item>
+        <item>灼烫</item>
+        <item>火灾</item>
+        <item>高处坠落</item>
+        <item>坍塌</item>
+        <item>冒顶片帮</item>
+        <item>透水</item>
+        <item>放炮</item>
+        <item>瓦斯爆炸</item>
+        <item>火药爆炸</item>
+        <item>锅炉爆炸</item>
+        <item>容器爆炸</item>
+        <item>其他爆炸</item>
+        <item>中毒和窒息</item>
+        <item>其他伤害</item>
+    </string-array>
+    <string-array name="lfssgdknxdx">
+        <item>10</item>
+        <item>6</item>
+        <item>3</item>
+        <item>1</item>
+        <item>0.5</item>
+        <item>0.2</item>
+        <item>0.1</item>
+    </string-array>
+    <string-array name="eblywxhj">
+        <item>10</item>
+        <item>6</item>
+        <item>3</item>
+        <item>1</item>
+        <item>0.5</item>
+    </string-array>
+    <string-array name="cfssgcsdhg">
+        <item>100</item>
+        <item>40</item>
+        <item>15</item>
+        <item>7</item>
+        <item>3</item>
+        <item>1</item>
+    </string-array>
+    <string-array name="fuelgas">
+        <item>是否取得工商营业执照</item>
+        <item>是否取得餐饮许可证</item>
+        <item>液化石油气、瓶组气化站的瓶装间是否设置在地下室或半地下室</item>
+        <item>使用瓶装压缩天然气的是否建立独立的瓶组气化站，站点防火间距是否>18米</item>
+        <item>瓶组气化站、燃气管道、用气设备、燃气监控设施及防雷防静电等是否符合《城镇燃气设计规范》(GB50028-2006)</item>
+        <item>用气场所是否按照有关规定安装可燃气体浓度报警装置</item>
+        <item>是否配备干粉灭火器等消防器材</item>
+        <item>燃气用具的安装、使用及其管路的设计、敷设应符合安全要求</item>
+        <item>是否使用过期或报废钢瓶</item>
+        <item>燃气钢瓶是否有合格标示、警示标示、充装标识</item>
+        <item>燃气供应企业是否取得燃气经营许可证</item>
+        <item>液化石油气是否来自开发区华洋或小海通液</item>
+        <item>是否与液化石油气供应单位签订供气合同</item>
+        <item>是否留存购气凭证</item>
+        <item>其购气凭证是否准确记载钢瓶注册登记代码和钢瓶条形码编号</item>
+        <item>存瓶总重量>=100千克(折合2瓶50千克或7瓶15千克气瓶)时，是否设置专用气瓶间</item>
+        <item>气瓶间是否设置在用气建筑相应的单层专用房间内</item>
+        <item>气瓶间建筑耐火等级是否不低于二级</item>
+        <item>气瓶间通风是否良好，并设有直通室外的门</item>
+        <item>气瓶间与其他房间相信的墙是否为无门、窗洞口中的防火墙</item>
+        <item>气瓶间是否至少配备2具8KG干粉灭火器</item>
+        <item>存瓶总量>=420kg,气瓶间是否为其他民用建筑间距不小于10米的独立建筑</item>
+        <item>气瓶间高度是否不低于2.2米</item>
+        <item>气瓶间内部是否加装可燃气体深度报警装置</item>
+        <item>气瓶间是否有暖气沟、地漏及其他地下构筑物</item>
+        <item>气瓶间外都是否设置明显的安全警示标志</item>
+        <item>气瓶间是否使用防爆型照明及设备、电器开头设置在室外</item>
+        <item>气相瓶和气液两相瓶是否专瓶专用</item>
+        <item>使用和备用钢瓶应当分开旋转或者用防火墙隔开</item>
+        <item>放置钢瓶、燃具和用户设备的房间内是否堆放易燃易爆物品和使用明火</item>
+        <item>同一房间内不得同时使用液化石油气和其他燃料</item>
+        <item>液化石油气钢瓶减压器正常使用期限是否超过15年</item>
+        <item>密封圈正常使用期限是否超过3年</item>
+        <item>钢瓶供应多台液化石油气灶具和大灶台的，是否采用硬管连接，并将用气设备固定</item>
+        <item>钢瓶与单台液化石油气灶具连接使用耐油橡胶软管的，是否用卡箍紧固</item>
+        <item>软管的长度是否在1.2米到2.0米之间，且没有接口</item>
+        <item>橡胶软管是否超过2年没有更换</item>
+        <item>软管是否出现老化、腐蚀等问题</item>
+        <item>否有燃气软管穿越墙壁、窗户和门</item>
+    </string-array>
+</resources>

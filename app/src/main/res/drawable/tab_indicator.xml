@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Non focused states -->
+    // 分割线
+    <item android:state_focused="false" android:state_selected="false" android:state_pressed="false" android:drawable="@color/aa" />
+    // 选中 凸起的分割线
+    <item android:state_focused="false" android:state_selected="true"  android:state_pressed="false" android:drawable="@color/bb"/>
+</selector>
