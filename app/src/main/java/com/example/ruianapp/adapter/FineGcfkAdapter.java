@@ -40,11 +40,13 @@ public class FineGcfkAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
     class RwHolder extends RecyclerView.ViewHolder{
         private TextView Gcfk_item_name;
+        private TextView Gcfk_item_saved;
         private TextView Gcfk_item_time;
         private View view;
         public RwHolder(View itemView) {
             super(itemView);
             Gcfk_item_name=(TextView)itemView.findViewById(R.id.fine_item_name);
+            Gcfk_item_saved=(TextView)itemView.findViewById(R.id.fine_item_saved);
             Gcfk_item_time=(TextView)itemView.findViewById(R.id.fine_item_time);
             view =itemView;
         }
@@ -63,6 +65,13 @@ public class FineGcfkAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
         final Gcfk Gcfk = GcfkList.get(position);
+        if (Gcfk.isSaved()){
+            ((RwHolder)holder).Gcfk_item_saved.setText("已提交");
+            ((RwHolder)holder).Gcfk_item_saved.setTextColor(Color.parseColor("#354B5E"));
+        }else {
+            ((RwHolder)holder).Gcfk_item_saved.setText("未提交");
+            ((RwHolder)holder).Gcfk_item_saved.setTextColor(Color.RED);
+        }
         SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd");
         try {

@@ -78,19 +78,19 @@ public class FineFragment extends Fragment implements View.OnClickListener{
             case R.id.fine_lx:
 //                Intent intent2 = new Intent(getActivity(), ContactActivity.class);
                 Intent intent2 = new Intent(getActivity(), FineActivity.class);
-                intent2.putExtra("type","lx");
+                intent2.putExtra("type","gclx");
                 startActivity(intent2);
                 break;
             case R.id.fine_tg:
 //                Intent intent3 = new Intent(getActivity(), LockoutActivity.class);
                 Intent intent3 = new Intent(getActivity(), FineActivity.class);
-                intent3.putExtra("type","tg");
+                intent3.putExtra("type","gctg");
                 startActivity(intent3);
                 break;
             case R.id.fine_zg:
 //                Intent intent4 = new Intent(getActivity(), SettleActivity.class);
                 Intent intent4 = new Intent(getActivity(), FineActivity.class);
-                intent4.putExtra("type","zg");
+                intent4.putExtra("type","zgtz");
                 startActivity(intent4);
                 break;
         }

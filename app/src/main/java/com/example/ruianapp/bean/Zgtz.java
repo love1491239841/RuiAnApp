@@ -1,5 +1,8 @@
 package com.example.ruianapp.bean;
 
+import org.litepal.crud.DataSupport;
+import org.litepal.crud.LitePalSupport;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -7,7 +10,7 @@ import java.util.Date;
  * Created by Administrator on 2018/6/19 0019.
  */
 
-public class Zgtz implements Serializable {
+public class Zgtz extends LitePalSupport implements Serializable {
     private int id;
     private String gcmc;
     private String bh;
@@ -33,8 +36,11 @@ public class Zgtz implements Serializable {
     private String addTime;
     private int userId;
     private String updateIds;
+    private String jd;
+    private String wd;
+    private boolean saved;
 
-    public Zgtz(int id, String gcmc, String bh, String gcdz, String fbdw, String sgdw, String dgdw, String zmr, String fssj, String problem, String cljzsj, String other, String qfr, String qfdw, String qfrq, String qsyj, String qsr, String qsrq, String fcyj, String fcr, String fcrq, String cs, String addTime, int userId, String updateIds) {
+    public Zgtz(int id, String gcmc, String bh, String gcdz, String fbdw, String sgdw, String dgdw, String zmr, String fssj, String problem, String cljzsj, String other, String qfr, String qfdw, String qfrq, String qsyj, String qsr, String qsrq, String fcyj, String fcr, String fcrq, String cs, String addTime, int userId, String updateIds, String jd, String wd, boolean saved) {
         this.id = id;
         this.gcmc = gcmc;
         this.bh = bh;
@@ -60,6 +66,9 @@ public class Zgtz implements Serializable {
         this.addTime = addTime;
         this.userId = userId;
         this.updateIds = updateIds;
+        this.jd = jd;
+        this.wd = wd;
+        this.saved = saved;
     }
 
     public int getId() {
@@ -260,5 +269,29 @@ public class Zgtz implements Serializable {
 
     public void setUpdateIds(String updateIds) {
         this.updateIds = updateIds;
+    }
+
+    public String getJd() {
+        return jd;
+    }
+
+    public void setJd(String jd) {
+        this.jd = jd;
+    }
+
+    public String getWd() {
+        return wd;
+    }
+
+    public void setWd(String wd) {
+        this.wd = wd;
+    }
+
+    public boolean isSaved() {
+        return saved;
+    }
+
+    public void setSaved(boolean saved) {
+        this.saved = saved;
     }
 }

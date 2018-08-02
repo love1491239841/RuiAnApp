@@ -358,7 +358,7 @@ public class FuelGasActivity extends AppCompatActivity implements View.OnClickLi
             @Override
             public void run() {
                 try {
-                    UtlisOkhttp.sendImageOkHttpRequest(enterprises.getName()+".png", Constants.CGRQIMG_URL,new okhttp3.Callback(){
+                    UtlisOkhttp.sendImageOkHttpRequest(Constants.path,enterprises.getName()+".png", Constants.CGRQIMG_URL,new okhttp3.Callback(){
                         @Override
                         public void onResponse(Call call, Response response) throws IOException {
                             String responseData=response.body().string();

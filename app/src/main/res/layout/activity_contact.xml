@@ -219,17 +219,24 @@
                 android:background="@drawable/common_shape" />
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="30dp"
+                android:layout_height="100dp"
                 android:orientation="horizontal">
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:gravity="center"
+                    android:layout_weight="0.3"
                     android:background="@drawable/common_shape"
-                    android:text="签发人： 江苏瑞安安全科技发展有限公司 "
-                    android:textSize="15dp"
-                    android:textColor="#000000"/>
+                    android:gravity="center"
+                    android:text="签发人:"
+                    android:textColor="#000000"
+                    android:textSize="15dp" />
+                <ImageView
+                    android:id="@+id/co_qfr"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.7"
+                    android:background="@drawable/common_shape"
+                    android:layout_gravity="center_vertical" />
             </LinearLayout>
             <LinearLayout
                 android:layout_width="match_parent"
@@ -273,26 +280,24 @@
             </LinearLayout>
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="30dp"
+                android:layout_height="100dp"
                 android:orientation="horizontal">
-
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="0.3"
+                    android:background="@drawable/common_shape"
                     android:gravity="center"
-                    android:background="@drawable/common_shape"
                     android:text="收件人:"
-                    android:textSize="15dp"
-                    android:textColor="#000000"/>
-
-                <EditText
+                    android:textColor="#000000"
+                    android:textSize="15dp" />
+                <ImageView
                     android:id="@+id/co_sjr"
-                    android:background="@drawable/common_shape"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="0.7"
-                    android:textSize="15dp"/>
+                    android:background="@drawable/common_shape"
+                    android:layout_gravity="center_vertical" />
             </LinearLayout>
             <LinearLayout
                 android:layout_width="match_parent"
@@ -335,26 +340,24 @@
             </LinearLayout>
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="30dp"
+                android:layout_height="100dp"
                 android:orientation="horizontal">
-
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="0.3"
+                    android:background="@drawable/common_shape"
                     android:gravity="center"
-                    android:background="@drawable/common_shape"
                     android:text="收件人:"
-                    android:textSize="15dp"
-                    android:textColor="#000000"/>
-
-                <EditText
-                    android:id="@+id/co_sjr1"
-                    android:background="@drawable/common_shape"
+                    android:textColor="#000000"
+                    android:textSize="15dp" />
+                <ImageView
+                    android:id="@+id/co_sjr2"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="0.7"
-                    android:textSize="15dp"/>
+                    android:background="@drawable/common_shape"
+                    android:layout_gravity="center_vertical" />
             </LinearLayout>
             <LinearLayout
                 android:layout_width="match_parent"

@@ -36,14 +36,30 @@
                 android:text="长江企业"
                 android:textColor="#ffffff"
                 android:textSize="20dp" />
-
-            <ImageView
-                android:id="@+id/projectfine_tj"
-                android:layout_width="25dp"
-                android:layout_height="25dp"
+            <LinearLayout
+                android:id="@+id/projectfine_bc"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:padding="10dp"
                 android:layout_gravity="center"
-                android:layout_marginRight="10dp"
-                android:src="@mipmap/tj" />
+                android:layout_marginRight="10dp">
+                <ImageView
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:src="@mipmap/bc" />
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/projectfine_tj"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:padding="10dp"
+                android:layout_gravity="center"
+                android:layout_marginRight="10dp">
+                <ImageView
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:src="@mipmap/tj" />
+            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
 
@@ -291,18 +307,24 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="30dp"
+                android:layout_height="100dp"
                 android:orientation="horizontal">
-
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:layout_weight="1"
+                    android:layout_weight="0.3"
                     android:background="@drawable/common_shape"
                     android:gravity="center"
-                    android:text="签发人： 江苏瑞安安全科技发展有限公司 "
+                    android:text="签发人:"
                     android:textColor="#000000"
                     android:textSize="15dp" />
+                <ImageView
+                    android:id="@+id/pr_fi_qfr"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.7"
+                    android:background="@drawable/common_shape"
+                    android:layout_gravity="center_vertical" />
             </LinearLayout>
 
             <LinearLayout
@@ -349,9 +371,8 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="30dp"
+                android:layout_height="100dp"
                 android:orientation="horizontal">
-
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
@@ -361,14 +382,13 @@
                     android:text="收件人:"
                     android:textColor="#000000"
                     android:textSize="15dp" />
-
-                <EditText
+                <ImageView
                     android:id="@+id/pr_fi_sjr"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="0.7"
                     android:background="@drawable/common_shape"
-                    android:textSize="15dp" />
+                    android:layout_gravity="center_vertical" />
             </LinearLayout>
 
             <LinearLayout
@@ -414,26 +434,24 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="30dp"
+                android:layout_height="100dp"
                 android:orientation="horizontal">
-
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="0.3"
                     android:background="@drawable/common_shape"
                     android:gravity="center"
-                    android:text="收件人:"
+                    android:text="签发人:"
                     android:textColor="#000000"
                     android:textSize="15dp" />
-
-                <EditText
+                <ImageView
                     android:id="@+id/pr_fi_sjr2"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="0.7"
                     android:background="@drawable/common_shape"
-                    android:textSize="15dp" />
+                    android:layout_gravity="center_vertical" />
             </LinearLayout>
 
             <LinearLayout
@@ -460,28 +478,6 @@
                     android:gravity="center_vertical"
                     android:textSize="15dp" />
             </LinearLayout>
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="100dp"
-                android:orientation="horizontal">
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="0.3"
-                    android:background="@drawable/common_shape"
-                    android:gravity="center"
-                    android:text="签名:"
-                    android:textColor="#000000"
-                    android:textSize="15dp" />
-                <ImageView
-                    android:id="@+id/pr_fi_qm"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="0.7"
-                    android:background="@drawable/common_shape"
-                    android:layout_gravity="center_vertical" />
-            </LinearLayout>
-
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="100dp"

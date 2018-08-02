@@ -1,5 +1,6 @@
 package com.example.ruianapp.activity;
 
+import android.content.Intent;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -39,8 +40,9 @@ public class SignatureActivity extends AppCompatActivity implements View.OnClick
             case R.id.save:
                 if (view.isSign())
                     try {
-                        view.save(Constants.path);
-                        setResult(101);
+                        Toast.makeText(this, getIntent().getStringExtra("name")+getIntent().getIntExtra("code",1), Toast.LENGTH_SHORT).show();
+                        view.save(Constants.path+ getIntent().getStringExtra("name"));
+                        setResult(getIntent().getIntExtra("code",1));
                         finish();
                     } catch (IOException e) {
                         e.printStackTrace();

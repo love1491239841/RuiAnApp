@@ -3,8 +3,11 @@ package com.example.ruianapp.activity;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -29,6 +32,10 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.baidu.location.BDLocation;
+import com.baidu.location.BDLocationListener;
+import com.baidu.location.LocationClient;
+import com.baidu.location.LocationClientOption;
 import com.example.ruianapp.R;
 import com.example.ruianapp.Utlis.Constants;
 import com.example.ruianapp.Utlis.JsonGet;
@@ -40,6 +47,7 @@ import com.google.gson.Gson;
 
 import org.litepal.crud.DataSupport;
 
+import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -54,7 +62,7 @@ public class SettleActivity extends AppCompatActivity implements View.OnClickLis
     private ImageView settle_fh;
     private TextView settle_titlename;
     private ImageView settle_tj;
-    private EditText se_gcmc,se_gcdz,se_fbdw,se_sgdw,se_dgdw,se_zmr,se_problem,se_other,se_qsyj,se_qsr,se_fcyj,se_fcr,se_cs;
+    private EditText se_gcmc,se_gcdz,se_fbdw,se_sgdw,se_dgdw,se_zmr,se_problem,se_other,se_qsyj,se_fcyj,se_cs;
     private Button se_cljzsj,se_qfrq,se_qsrq,se_fcrq,se_fssj;
     String gcmc,gcdz,fbdw,sgdw,dgdw,zmr,fssj,problem,other,qfr,qfdw,qsyj,qsr,fcyj,fcr,cs,update_ids;
     private String cljzsj,qfrq,qsrq,fcrq,add_time;
@@ -67,18 +75,36 @@ public class SettleActivity extends AppCompatActivity implements View.OnClickLis
     private ArrayAdapter arrayAdapter;
     private View popupView;
     private String name1,legal,address,phone,email,jd,wd;
+    private LocationClient mLocationClient;
+    private double latitude;
+    private double longitude;
+    private ImageView se_qfr,se_qsr,se_fcr;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settle);
+        mLocationClient = new LocationClient(getApplicationContext());
+        mLocationClient.registerLocationListener(new MyLicationListener());
         zgtz = (Zgtz) getIntent().getSerializableExtra("zgtz");
         if (zgtz !=null){
             initobserve();
         }else {
             initView();
+            requestLocation();
         }
 
+    }
+    private void requestLocation(){
+        initLocation();
+        mLocationClient.start();
+    }
+    private void initLocation(){
+        LocationClientOption option = new LocationClientOption();
+        option.setCoorType("bd09ll");
+//        option.setScanSpan(5000);
+        option.setIsNeedAddress(true);
+        mLocationClient.setLocOption(option);
     }
     private void initView(){
         if (Build.VERSION.SDK_INT >= 21) {
@@ -165,9 +191,7 @@ public class SettleActivity extends AppCompatActivity implements View.OnClickLis
         se_problem=(EditText)findViewById(R.id.se_problem);
         se_other=(EditText)findViewById(R.id.se_other);
         se_qsyj=(EditText)findViewById(R.id.se_qsyj);
-        se_qsr=(EditText)findViewById(R.id.se_qsr);
         se_fcyj=(EditText)findViewById(R.id.se_fcyj);
-        se_fcr=(EditText)findViewById(R.id.se_fcr);
         se_cs=(EditText)findViewById(R.id.se_cs);
         se_cljzsj=(Button)findViewById(R.id.se_cljzsj);
         se_qfrq=(Button)findViewById(R.id.se_qfrq);
@@ -177,6 +201,8 @@ public class SettleActivity extends AppCompatActivity implements View.OnClickLis
         se_qfrq.setOnClickListener(this);
         se_qsrq.setOnClickListener(this);
         se_fcrq.setOnClickListener(this);
+        se_qsr= (ImageView) findViewById(R.id.se_qsr);
+        se_fcr= (ImageView) findViewById(R.id.se_fcr);
     }
     private void initData(){
         gcmc=se_gcmc.getText().toString();
@@ -193,10 +219,10 @@ public class SettleActivity extends AppCompatActivity implements View.OnClickLis
         qfdw="江苏瑞安安全科技发展有限公司";
         qfrq=se_qfrq.getText().toString();
         qsyj=se_qsyj.getText().toString();
-        qsr=se_qsr.getText().toString();
+//        qsr=se_qsr.getText().toString();
         qsrq=se_qsrq.getText().toString();
         fcyj=se_fcyj.getText().toString();
-        fcr=se_fcr.getText().toString();
+//        fcr=se_fcr.getText().toString();
         fcrq=se_fcrq.getText().toString();
         cs=se_cs.getText().toString();
         add_time=new SimpleDateFormat("yyyy-MM-dd ").format(new Date());
@@ -204,13 +230,13 @@ public class SettleActivity extends AppCompatActivity implements View.OnClickLis
         user_id=preferences.getInt("id",0);
         update_ids=preferences.getInt("id",0)+"";
     }
-    private void okHttp(){
+    private void okHttp(boolean saved){
         if (gcmc.length()==0 || gcdz.length()==0 || fbdw.length()==0 || sgdw.length()==0 || dgdw.length()==0 || zmr.length()==0 || fssj.length()==0 ||
                 fssj.length()==0 || problem.length()==0 || other.length()==0 || qsyj.length()==0 || qsr.length()==0 || fcyj.length()==0 || fcr.length()==0 || cs.length()==0){
             Toast.makeText(this, "内容不能为空", Toast.LENGTH_SHORT).show();
         }else {
             Gson gson = new Gson();
-            Zgtz gcfk = new Zgtz(0,gcmc,"", gcdz, fbdw, sgdw, dgdw, zmr, fssj, problem, cljzsj, other, qfr, qfdw, qfrq, qsyj, qsr, qsrq, fcyj, fcr, fcrq, cs, add_time, user_id, update_ids);
+            Zgtz gcfk = new Zgtz(0,gcmc,"", gcdz, fbdw, sgdw, dgdw, zmr, fssj, problem, cljzsj, other, qfr, qfdw, qfrq, qsyj, "", qsrq, fcyj, "", fcrq, cs, add_time, user_id, update_ids,latitude+"",longitude+"",saved);
             final String jsonText = gson.toJson(gcfk);
             new Thread(new Runnable() {
                 @Override
@@ -246,6 +272,41 @@ public class SettleActivity extends AppCompatActivity implements View.OnClickLis
             }
         });
     }
+    private void okhttpimage(){
+        final List<File> files = new ArrayList<>();
+        files.add(new File(Constants.path+"qfr.png"));
+        files.add(new File(Constants.path+"qsr.png"));
+        files.add(new File(Constants.path+"fcr.png"));
+        final List<String> keys = new ArrayList<>();
+        keys.add("qfr");
+        keys.add("qsr");
+        keys.add("fcr");
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    UtlisOkhttp.sendImagesOkHttpRequest(keys,files, Constants.GCFKIMAGE_URL,new okhttp3.Callback(){
+                        @Override
+                        public void onResponse(Call call, Response response) throws IOException {
+                            String responseData=response.body().string();
+                            showimgResponse(responseData);
+                        }
+                        @Override
+                        public void onFailure(Call call,IOException e){
+
+                        }
+                    });
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+
+            }
+        }).start();
+    }
+    private void showimgResponse(final String response) {
+        //在子线程中更新UI
+        System.out.println("asdfghjkl2"+response);
+    }
 
     @Override
     public void onClick(View view) {
@@ -278,8 +339,9 @@ public class SettleActivity extends AppCompatActivity implements View.OnClickLis
                                         se_qfrq.getText().length()==0 || se_qsrq.getText().length()==0 || se_fcrq.getText().length()==0){
                                     Toast.makeText(SettleActivity.this, "日期和罚款金额不能为空", Toast.LENGTH_SHORT).show();
                                 }else {
+                                    okhttpimage();
                                     initData();
-                                    okHttp();
+                                    okHttp(true);
                                 }
                             }
                         })
@@ -417,6 +479,24 @@ public class SettleActivity extends AppCompatActivity implements View.OnClickLis
                 DatePickerDialog dialog5=new DatePickerDialog(SettleActivity.this, 0,listener5,mYear,mMonth,mDay);//后边三个参数为显示dialog时默认的日期，月份从0开始，0-11对应1-12个月
                 dialog5.show();
                 break;
+            case R.id.se_qfr:
+                Intent intent = new Intent(SettleActivity.this, SignatureActivity.class);
+                intent.putExtra("name","qfr.png");
+                intent.putExtra("code",101);
+                startActivityForResult(intent, 1);
+                break;
+            case R.id.se_qsr:
+                Intent intent1 = new Intent(SettleActivity.this, SignatureActivity.class);
+                intent1.putExtra("name","qsr.png");
+                intent1.putExtra("code",102);
+                startActivityForResult(intent1, 1);
+                break;
+            case R.id.se_fcr:
+                Intent intent2 = new Intent(SettleActivity.this, SignatureActivity.class);
+                intent2.putExtra("name","fcr.png");
+                intent2.putExtra("code",103);
+                startActivityForResult(intent2, 1);
+                break;
         }
     }
     @Override
@@ -516,21 +596,21 @@ public class SettleActivity extends AppCompatActivity implements View.OnClickLis
         se_qsyj.setTextColor(Color.parseColor("#000000"));
         se_qsyj.setTextSize(18);
         se_qsyj.setEnabled(false);
-        se_qsr=(EditText)findViewById(R.id.se_qsr);
-        se_qsr.setText(zgtz.getQsr());
-        se_qsr.setTextColor(Color.parseColor("#000000"));
-        se_qsr.setTextSize(18);
-        se_qsr.setEnabled(false);
+//        se_qsr=(EditText)findViewById(R.id.se_qsr);
+//        se_qsr.setText(zgtz.getQsr());
+//        se_qsr.setTextColor(Color.parseColor("#000000"));
+//        se_qsr.setTextSize(18);
+//        se_qsr.setEnabled(false);
         se_fcyj=(EditText)findViewById(R.id.se_fcyj);
         se_fcyj.setText(zgtz.getFcyj());
         se_fcyj.setTextColor(Color.parseColor("#000000"));
         se_fcyj.setTextSize(18);
         se_fcyj.setEnabled(false);
-        se_fcr=(EditText)findViewById(R.id.se_fcr);
-        se_fcr.setText(zgtz.getFcr());
-        se_fcr.setTextColor(Color.parseColor("#000000"));
-        se_fcr.setTextSize(18);
-        se_fcr.setEnabled(false);
+//        se_fcr=(EditText)findViewById(R.id.se_fcr);
+//        se_fcr.setText(zgtz.getFcr());
+//        se_fcr.setTextColor(Color.parseColor("#000000"));
+//        se_fcr.setTextSize(18);
+//        se_fcr.setEnabled(false);
         se_cs=(EditText)findViewById(R.id.se_cs);
         se_cs.setText(zgtz.getCs());
         se_cs.setTextColor(Color.parseColor("#000000"));
@@ -596,5 +676,47 @@ public class SettleActivity extends AppCompatActivity implements View.OnClickLis
         WindowManager.LayoutParams lp=this.getWindow().getAttributes();
         lp.alpha=f;
         this.getWindow().setAttributes(lp);
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == 101) {
+            Toast.makeText(this, "保存成功", Toast.LENGTH_SHORT).show();
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inSampleSize = 2;
+            Bitmap bm = BitmapFactory.decodeFile(Constants.path+"qfr.png", options);
+            se_qfr.setImageBitmap(bm);
+//            Glide.with(this).load(path + ".sign").skipMemoryCache(true).diskCacheStrategy(DiskCacheStrategy.NONE).into(img);
+        }else if (resultCode==102){
+            Toast.makeText(this, "保存成功", Toast.LENGTH_SHORT).show();
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inSampleSize = 2;
+            Bitmap bm = BitmapFactory.decodeFile(Constants.path+"sjr.png", options);
+            se_qsr.setImageBitmap(bm);
+        }else if (resultCode==103){
+            Toast.makeText(this, "保存成功", Toast.LENGTH_SHORT).show();
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inSampleSize = 2;
+            Bitmap bm = BitmapFactory.decodeFile(Constants.path+"sjr2.png", options);
+            se_fcr.setImageBitmap(bm);
+        }
+    }
+    public class MyLicationListener implements BDLocationListener {
+
+        @Override
+        public void onReceiveLocation(final BDLocation bdLocation) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    latitude = bdLocation.getLatitude();
+                    longitude = bdLocation.getLongitude();
+                }
+            });
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mLocationClient.stop();
     }
 }

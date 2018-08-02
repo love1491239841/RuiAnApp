@@ -34,15 +34,25 @@ public class Constants {
     public final static String GCTGList_URL = URL+"gctgtzd/gctgtzdList";
     public final static String ZGTZ_URL = URL+"zgtzd/saveZgtzd";
     public final static String ZGTZList_URL = URL+"zgtzd/zgtzdList";
+//    public final static String GCFKIMAGE_URL = URL+"gcfktzd/uploadFkdImages";
+    public final static String GCFKIMAGE_URL = "http://192.168.43.144:8000/img";
+    public final static String GCLXIMAGE_URL = "http://192.168.43.144:8000/img";
+    public final static String GCTGIMAGE_URL = "http://192.168.43.144:8000/img";
+    public final static String GCZGIMAGE_URL = "http://192.168.43.144:8000/img";
+    public final static String path = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator ;
+
+
+
+
     public final static String CGJC_URL = "http://192.168.43.144:8000/index";
     public final static String CGJCIMG_URL = "http://192.168.43.144:8000/img";
     public final static String CGRQ_URL = "http://192.168.43.144:8000/index";
     public final static String CGRQIMG_URL = "http://192.168.43.144:8000/img";
+
     /*
     * 以下是企业操作的接口
     * */
     public final static String News_URL = URL+"news/newsList";
-    public final static String path = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "ls.png";
     public final static String MyPlan_URL = URL+"commonData/workPlansListBySelf";
     public final static String MyLeave_URL = URL+"askLeave/askLeaveListBySelf";
     public final static String MyTask_URL = URL+"task/tasksList";

@@ -4,8 +4,11 @@ import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -30,6 +33,11 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
+
+import com.baidu.location.BDLocation;
+import com.baidu.location.BDLocationListener;
+import com.baidu.location.LocationClient;
+import com.baidu.location.LocationClientOption;
 import com.example.ruianapp.R;
 import com.example.ruianapp.Utlis.Constants;
 import com.example.ruianapp.Utlis.JsonGet;
@@ -41,6 +49,7 @@ import com.google.gson.GsonBuilder;
 
 import org.litepal.crud.DataSupport;
 
+import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -57,7 +66,7 @@ public class ContactActivity extends AppCompatActivity implements View.OnClickLi
     private ImageView contact_fh;
     private TextView contact_titleName;
     private ImageView contact_tj;
-    private EditText co_gcmc,co_gcdz,co_fbdw,co_sgdw,co_dgdw,co_zmr,co_problem,co_sjr,co_sjr2;
+    private EditText co_gcmc,co_gcdz,co_fbdw,co_sgdw,co_dgdw,co_zmr,co_problem;
     private Button co_qfrq,co_sjrq,co_sjrq2;
     private String gcmc,gcdz,fbdw,sgdw,dgdw,zmr,problem,qfr,qfdw,sjr,sjr2,update_ids;
     private String qfrq,sjrq,sjrq2,add_time;
@@ -70,6 +79,10 @@ public class ContactActivity extends AppCompatActivity implements View.OnClickLi
     private ArrayAdapter arrayAdapter;
     private View popupView;
     private String name1,legal,address,phone,email,jd,wd;
+    private ImageView co_qfr,co_sjr,co_sjr2;
+    private LocationClient mLocationClient;
+    private double latitude;
+    private double longitude;
 
 
 
@@ -77,13 +90,28 @@ public class ContactActivity extends AppCompatActivity implements View.OnClickLi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contact);
+        mLocationClient = new LocationClient(getApplicationContext());
+        mLocationClient.registerLocationListener(new MyLicationListener());
+
         gclx = (Gclx) getIntent().getSerializableExtra("lx");
         if (gclx != null){
             initobserve();
         }else {
             initView();
+            requestLocation();
         }
 
+    }
+    private void requestLocation(){
+        initLocation();
+        mLocationClient.start();
+    }
+    private void initLocation(){
+        LocationClientOption option = new LocationClientOption();
+        option.setCoorType("bd09ll");
+//        option.setScanSpan(5000);
+        option.setIsNeedAddress(true);
+        mLocationClient.setLocOption(option);
     }
     private void initView(){
         if (Build.VERSION.SDK_INT >= 21) {
@@ -170,14 +198,19 @@ public class ContactActivity extends AppCompatActivity implements View.OnClickLi
         co_dgdw=(EditText)findViewById(R.id.co_jddw);
         co_zmr=(EditText)findViewById(R.id.co_zhi);
         co_problem=(EditText)findViewById(R.id.co_note);
-        co_sjr=(EditText)findViewById(R.id.co_sjr);
-        co_sjr2=(EditText)findViewById(R.id.co_sjr1);
         co_qfrq=(Button)findViewById(R.id.co_time);
         co_sjrq=(Button)findViewById(R.id.co_time1);
         co_sjrq2=(Button)findViewById(R.id.co_time2);
         co_qfrq.setOnClickListener(this);
         co_sjrq.setOnClickListener(this);
         co_sjrq2.setOnClickListener(this);
+        co_qfr = (ImageView) findViewById(R.id.co_qfr);
+        co_sjr= (ImageView) findViewById(R.id.co_sjr);
+        co_sjr2= (ImageView) findViewById(R.id.co_sjr2);
+        co_qfr.setOnClickListener(this);
+        co_sjr.setOnClickListener(this);
+        co_sjr2.setOnClickListener(this);
+
     }
     private void initData(){
         gcmc=co_gcmc.getText().toString();
@@ -190,23 +223,20 @@ public class ContactActivity extends AppCompatActivity implements View.OnClickLi
         qfr="江苏瑞安安全科技发展有限公司";
         qfdw="江苏瑞安安全科技发展有限公司";
         qfrq=co_qfrq.getText().toString();
-        sjr=co_sjr.getText().toString();
         sjrq=co_sjrq.getText().toString();
-        sjr2=co_sjr2.getText().toString();
         sjrq2=co_sjrq2.getText().toString();
         add_time=new SimpleDateFormat("yyyy-MM-dd ").format(new Date());
         SharedPreferences preferences = getSharedPreferences("data",MODE_PRIVATE);
         user_id=preferences.getInt("id",0);
         update_ids=preferences.getInt("id",0)+"";
-
     }
-    private void okHttp(){
+    private void okHttp(boolean saved){
         if (gcmc.length()==0 || gcdz.length()==0 || fbdw.length()==0 || sgdw.length()==0 || dgdw.length()==0 || zmr.length()==0 || problem.length()==0 || co_qfrq.getText().length()==0 ||
-                sjr.length()==0 || co_sjrq.getText().length()==0 || sjr2.length()==0 || co_sjrq2.getText().length()==0){
+                co_sjrq.getText().length()==0 || co_sjrq2.getText().length()==0){
             Toast.makeText(this, "内容不能为空", Toast.LENGTH_SHORT).show();
         }else {
             Gson gson = new Gson();
-            Gclx gcfk = new Gclx(0,gcmc,"",gcdz,fbdw,sgdw,dgdw,zmr,problem,qfr,qfdw,qfrq,sjr,sjrq,sjr2,sjrq2,add_time,user_id,update_ids);
+            Gclx gcfk = new Gclx(0,gcmc,"",gcdz,fbdw,sgdw,dgdw,zmr,problem,qfr,qfdw,qfrq,"",sjrq,"",sjrq2,add_time,user_id,update_ids,latitude+"",longitude+"",saved);
             final String jsonText=gson.toJson(gcfk);
 //            Map<String, Object> map = new HashMap<String, Object>();
 //            map.put("userId", user_id);
@@ -247,6 +277,41 @@ public class ContactActivity extends AppCompatActivity implements View.OnClickLi
             }
         });
     }
+    private void okhttpimage(){
+        final List<File> files = new ArrayList<>();
+        files.add(new File(Constants.path+"qfr.png"));
+        files.add(new File(Constants.path+"sjr.png"));
+        files.add(new File(Constants.path+"sjr2.png"));
+        final List<String> keys = new ArrayList<>();
+        keys.add("qfr");
+        keys.add("sjr");
+        keys.add("sjr2");
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    UtlisOkhttp.sendImagesOkHttpRequest(keys,files, Constants.GCLXIMAGE_URL,new okhttp3.Callback(){
+                        @Override
+                        public void onResponse(Call call, Response response) throws IOException {
+                            String responseData=response.body().string();
+                            showimgResponse(responseData);
+                        }
+                        @Override
+                        public void onFailure(Call call,IOException e){
+
+                        }
+                    });
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+
+            }
+        }).start();
+    }
+    private void showimgResponse(final String response) {
+        //在子线程中更新UI
+        System.out.println("asdfghjkl2"+response);
+    }
 
     @Override
     public void onClick(View view) {
@@ -275,13 +340,15 @@ public class ContactActivity extends AppCompatActivity implements View.OnClickLi
                         .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                if (co_qfrq.getText().length()==0 ||
-                                        co_sjrq.getText().length()==0 || co_sjrq2.getText().length()==0){
-                                    Toast.makeText(ContactActivity.this, "日期不能为空", Toast.LENGTH_SHORT).show();
-                                }else {
-                                    initData();
-                                    okHttp();
-                                }
+                                okhttpimage();
+//                                if (co_qfrq.getText().length()==0 ||
+//                                        co_sjrq.getText().length()==0 || co_sjrq2.getText().length()==0){
+//                                    Toast.makeText(ContactActivity.this, "日期不能为空", Toast.LENGTH_SHORT).show();
+//                                }else {
+//                                    initData();
+//
+//                                    okHttp(true);
+//                                }
                             }
                         })
                         .setNegativeButton("取消", null)
@@ -364,6 +431,24 @@ public class ContactActivity extends AppCompatActivity implements View.OnClickLi
                 };
                 DatePickerDialog dialog3=new DatePickerDialog(ContactActivity.this, 0,listener3,mYear,mMonth,mDay);//后边三个参数为显示dialog时默认的日期，月份从0开始，0-11对应1-12个月
                 dialog3.show();
+                break;
+            case R.id.co_qfr:
+                Intent intent = new Intent(ContactActivity.this, SignatureActivity.class);
+                intent.putExtra("name","qfr.png");
+                intent.putExtra("code",101);
+                startActivityForResult(intent, 1);
+                break;
+            case R.id.co_sjr:
+                Intent intent1 = new Intent(ContactActivity.this, SignatureActivity.class);
+                intent1.putExtra("name","sjr.png");
+                intent1.putExtra("code",102);
+                startActivityForResult(intent1, 1);
+                break;
+            case R.id.co_sjr2:
+                Intent intent2 = new Intent(ContactActivity.this, SignatureActivity.class);
+                intent2.putExtra("name","sjr2.png");
+                intent2.putExtra("code",103);
+                startActivityForResult(intent2, 1);
                 break;
         }
     }
@@ -451,16 +536,6 @@ public class ContactActivity extends AppCompatActivity implements View.OnClickLi
         co_problem.setEnabled(false);
         co_problem.setTextColor(Color.parseColor("#000000"));
         co_problem.setTextSize(18);
-        co_sjr=(EditText)findViewById(R.id.co_sjr);
-        co_sjr.setText(gclx.getSjr());
-        co_sjr.setEnabled(false);
-        co_sjr.setTextColor(Color.parseColor("#000000"));
-        co_sjr.setTextSize(18);
-        co_sjr2=(EditText)findViewById(R.id.co_sjr1);
-        co_sjr2.setText(gclx.getSjr2());
-        co_sjr2.setEnabled(false);
-        co_sjr2.setTextColor(Color.parseColor("#000000"));
-        co_sjr2.setTextSize(18);
         co_qfrq=(Button)findViewById(R.id.co_time);
         co_qfrq.setText(gclx.getQfrq());
         co_qfrq.setEnabled(false);
@@ -517,5 +592,48 @@ public class ContactActivity extends AppCompatActivity implements View.OnClickLi
         WindowManager.LayoutParams lp=this.getWindow().getAttributes();
         lp.alpha=f;
         this.getWindow().setAttributes(lp);
+    }
+
+    public class MyLicationListener implements BDLocationListener {
+
+        @Override
+        public void onReceiveLocation(final BDLocation bdLocation) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    latitude = bdLocation.getLatitude();
+                    longitude = bdLocation.getLongitude();
+                }
+            });
+        }
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == 101) {
+            Toast.makeText(this, "保存成功", Toast.LENGTH_SHORT).show();
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inSampleSize = 2;
+            Bitmap bm = BitmapFactory.decodeFile(Constants.path+"qfr.png", options);
+            co_qfr.setImageBitmap(bm);
+//            Glide.with(this).load(path + ".sign").skipMemoryCache(true).diskCacheStrategy(DiskCacheStrategy.NONE).into(img);
+        }else if (resultCode==102){
+            Toast.makeText(this, "保存成功", Toast.LENGTH_SHORT).show();
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inSampleSize = 2;
+            Bitmap bm = BitmapFactory.decodeFile(Constants.path+"sjr.png", options);
+            co_sjr.setImageBitmap(bm);
+        }else if (resultCode==103){
+            Toast.makeText(this, "保存成功", Toast.LENGTH_SHORT).show();
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inSampleSize = 2;
+            Bitmap bm = BitmapFactory.decodeFile(Constants.path+"sjr2.png", options);
+            co_sjr2.setImageBitmap(bm);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mLocationClient.stop();
     }
 }

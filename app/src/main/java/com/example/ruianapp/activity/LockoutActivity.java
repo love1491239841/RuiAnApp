@@ -3,8 +3,11 @@ package com.example.ruianapp.activity;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -29,6 +32,10 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.baidu.location.BDLocation;
+import com.baidu.location.BDLocationListener;
+import com.baidu.location.LocationClient;
+import com.baidu.location.LocationClientOption;
 import com.example.ruianapp.R;
 import com.example.ruianapp.Utlis.Constants;
 import com.example.ruianapp.Utlis.JsonGet;
@@ -41,6 +48,7 @@ import com.google.gson.Gson;
 
 import org.litepal.crud.DataSupport;
 
+import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -55,7 +63,7 @@ public class LockoutActivity extends AppCompatActivity implements View.OnClickLi
     private ImageView lockout_fh;
     private TextView lockout_titlename;
     private ImageView lockout_tj;
-    private EditText lo_gcmc,lo_gcdz,lo_fbdw,lo_sgdw,lo_dgdw,lo_zmr,lo_problem,lo_other,lo_qsyj,lo_qsr,lo_fcyj,lo_fcr,lo_cs;
+    private EditText lo_gcmc,lo_gcdz,lo_fbdw,lo_sgdw,lo_dgdw,lo_zmr,lo_problem,lo_other,lo_qsyj,lo_fcyj,lo_cs;
     private Button lo_cljzsj,lo_qfrq,lo_qsrq,lo_fcrq,lo_fssj;
     String gcmc,gcdz,fbdw,sgdw,dgdw,zmr,fssj,problem,other,qfr,qfdw,qsyj,qsr,fcyj,fcr,cs,update_ids;
     private String cljzsj,qfrq,qsrq,fcrq,add_time;
@@ -68,17 +76,34 @@ public class LockoutActivity extends AppCompatActivity implements View.OnClickLi
     private ArrayAdapter arrayAdapter;
     private View popupView;
     private String name1,legal,address,phone,email,jd,wd;
-
+    private ImageView lo_qfr,lo_qsr,lo_fcr;
+    private LocationClient mLocationClient;
+    private double latitude;
+    private double longitude;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lockout);
+        mLocationClient = new LocationClient(getApplicationContext());
+        mLocationClient.registerLocationListener(new MyLicationListener());
         gctg = (Gctg) getIntent().getSerializableExtra("tg");
         if (gctg!=null){
             initbserve();
         }else {
+            requestLocation();
             initView();
         }
+    }
+    private void requestLocation(){
+        initLocation();
+        mLocationClient.start();
+    }
+    private void initLocation(){
+        LocationClientOption option = new LocationClientOption();
+        option.setCoorType("bd09ll");
+//        option.setScanSpan(5000);
+        option.setIsNeedAddress(true);
+        mLocationClient.setLocOption(option);
     }
     private void initView(){
         if (Build.VERSION.SDK_INT >= 21) {
@@ -166,9 +191,7 @@ public class LockoutActivity extends AppCompatActivity implements View.OnClickLi
         lo_problem=(EditText)findViewById(R.id.lo_problem);
         lo_other=(EditText)findViewById(R.id.lo_other);
         lo_qsyj=(EditText)findViewById(R.id.lo_qsyj);
-        lo_qsr=(EditText)findViewById(R.id.lo_qsr);
         lo_fcyj=(EditText)findViewById(R.id.lo_fcyj);
-        lo_fcr=(EditText)findViewById(R.id.lo_fcr);
         lo_cs=(EditText)findViewById(R.id.lo_cs);
         lo_cljzsj=(Button)findViewById(R.id.lo_cljzsj);
         lo_qfrq=(Button)findViewById(R.id.lo_qfrq);
@@ -178,6 +201,10 @@ public class LockoutActivity extends AppCompatActivity implements View.OnClickLi
         lo_qfrq.setOnClickListener(this);
         lo_qsrq.setOnClickListener(this);
         lo_fcrq.setOnClickListener(this);
+        lo_qfr= (ImageView) findViewById(R.id.lo_qfr);
+        lo_qsr= (ImageView) findViewById(R.id.lo_qsr);
+        lo_fcr= (ImageView) findViewById(R.id.lo_fcr);
+
     }
     private void initData(){
         gcmc=lo_gcmc.getText().toString();
@@ -194,10 +221,10 @@ public class LockoutActivity extends AppCompatActivity implements View.OnClickLi
         qfdw="江苏瑞安安全科技发展有限公司";
         qfrq=lo_qfrq.getText().toString();
         qsyj=lo_qsyj.getText().toString();
-        qsr=lo_qsr.getText().toString();
+//        qsr=lo_qsr.getText().toString();
         qsrq=lo_qsrq.getText().toString();
         fcyj=lo_fcyj.getText().toString();
-        fcr=lo_fcr.getText().toString();
+//        fcr=lo_fcr.getText().toString();
         fcrq=lo_fcrq.getText().toString();
         cs=lo_cs.getText().toString();
         add_time=new SimpleDateFormat("yyyy-MM-dd ").format(new Date());
@@ -205,13 +232,13 @@ public class LockoutActivity extends AppCompatActivity implements View.OnClickLi
         user_id=preferences.getInt("id",0);
         update_ids=preferences.getInt("id",0)+"";
     }
-    private void okHttp(){
+    private void okHttp(boolean saved){
         if (gcmc.length()==0 || gcdz.length()==0 || fbdw.length()==0 || sgdw.length()==0 || dgdw.length()==0 || zmr.length()==0 || fssj.length()==0 ||
-                fssj.length()==0 || problem.length()==0 || other.length()==0 || qsyj.length()==0 || qsr.length()==0 || fcyj.length()==0 || fcr.length()==0 || cs.length()==0){
+                fssj.length()==0 || problem.length()==0 || other.length()==0 || qsyj.length()==0 || fcyj.length()==0 || cs.length()==0){
             Toast.makeText(this, "内容不能为空", Toast.LENGTH_SHORT).show();
         }else {
             Gson gson = new Gson();
-            Gctg gcfk = new Gctg(0,gcmc,"", gcdz, fbdw, sgdw, dgdw, zmr, fssj, problem, cljzsj, other, qfr, qfdw, qfrq, qsyj, qsr, qsrq, fcyj, fcr, fcrq, cs, add_time, user_id, update_ids);
+            Gctg gcfk = new Gctg(0,gcmc,"", gcdz, fbdw, sgdw, dgdw, zmr, fssj, problem, cljzsj, other, qfr, qfdw, qfrq, qsyj, "", qsrq, fcyj, "", fcrq, cs, add_time, user_id, update_ids,latitude+"",longitude+"",saved);
             final String jsonText = gson.toJson(gcfk);
             System.out.println("123456" + jsonText);
             new Thread(new Runnable() {
@@ -248,6 +275,41 @@ public class LockoutActivity extends AppCompatActivity implements View.OnClickLi
             }
         });
     }
+    private void okhttpimage(){
+        final List<File> files = new ArrayList<>();
+        files.add(new File(Constants.path+"qfr.png"));
+        files.add(new File(Constants.path+"qsr.png"));
+        files.add(new File(Constants.path+"fcr.png"));
+        final List<String> keys = new ArrayList<>();
+        keys.add("qfr");
+        keys.add("qsr");
+        keys.add("fcr");
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    UtlisOkhttp.sendImagesOkHttpRequest(keys,files, Constants.GCFKIMAGE_URL,new okhttp3.Callback(){
+                        @Override
+                        public void onResponse(Call call, Response response) throws IOException {
+                            String responseData=response.body().string();
+                            showimgResponse(responseData);
+                        }
+                        @Override
+                        public void onFailure(Call call,IOException e){
+
+                        }
+                    });
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+
+            }
+        }).start();
+    }
+    private void showimgResponse(final String response) {
+        //在子线程中更新UI
+        System.out.println("asdfghjkl2"+response);
+    }
 
     @Override
     public void onClick(View view) {
@@ -280,8 +342,10 @@ public class LockoutActivity extends AppCompatActivity implements View.OnClickLi
                                         lo_qfrq.getText().length()==0 || lo_qsrq.getText().length()==0 || lo_fcrq.getText().length()==0){
                                     Toast.makeText(LockoutActivity.this, "日期和罚款金额不能为空", Toast.LENGTH_SHORT).show();
                                 }else {
+                                    okhttpimage();
                                     initData();
-                                    okHttp();
+                                    okHttp(true);
+
                                 }
                             }
                         })
@@ -418,7 +482,48 @@ public class LockoutActivity extends AppCompatActivity implements View.OnClickLi
                 DatePickerDialog dialog5=new DatePickerDialog(LockoutActivity.this, 0,listener5,mYear,mMonth,mDay);//后边三个参数为显示dialog时默认的日期，月份从0开始，0-11对应1-12个月
                 dialog5.show();
                 break;
+            case R.id.lo_qfr:
+                Intent intent = new Intent(LockoutActivity.this, SignatureActivity.class);
+                intent.putExtra("name","qfr.png");
+                intent.putExtra("code",101);
+                startActivityForResult(intent, 1);
+                break;
+            case R.id.lo_qsr:
+                Intent intent1 = new Intent(LockoutActivity.this, SignatureActivity.class);
+                intent1.putExtra("name","qsr.png");
+                intent1.putExtra("code",102);
+                startActivityForResult(intent1, 1);
+                break;
+            case R.id.lo_fcr:
+                Intent intent2 = new Intent(LockoutActivity.this, SignatureActivity.class);
+                intent2.putExtra("name","fcr.png");
+                intent2.putExtra("code",103);
+                startActivityForResult(intent2, 1);
+                break;
 
+        }
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == 101) {
+            Toast.makeText(this, "保存成功", Toast.LENGTH_SHORT).show();
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inSampleSize = 2;
+            Bitmap bm = BitmapFactory.decodeFile(Constants.path+"qfr.png", options);
+            lo_qfr.setImageBitmap(bm);
+//            Glide.with(this).load(path + ".sign").skipMemoryCache(true).diskCacheStrategy(DiskCacheStrategy.NONE).into(img);
+        }else if (resultCode==102){
+            Toast.makeText(this, "保存成功", Toast.LENGTH_SHORT).show();
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inSampleSize = 2;
+            Bitmap bm = BitmapFactory.decodeFile(Constants.path+"sjr.png", options);
+            lo_qsr.setImageBitmap(bm);
+        }else if (resultCode==103){
+            Toast.makeText(this, "保存成功", Toast.LENGTH_SHORT).show();
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inSampleSize = 2;
+            Bitmap bm = BitmapFactory.decodeFile(Constants.path+"sjr2.png", options);
+            lo_fcr.setImageBitmap(bm);
         }
     }
     @Override
@@ -519,21 +624,21 @@ public class LockoutActivity extends AppCompatActivity implements View.OnClickLi
         lo_qsyj.setTextColor(Color.parseColor("#000000"));
         lo_qsyj.setTextSize(18);
         lo_qsyj.setEnabled(false);
-        lo_qsr=(EditText)findViewById(R.id.lo_qsr);
-        lo_qsr.setText(gctg.getQsr());
-        lo_qsr.setTextColor(Color.parseColor("#000000"));
-        lo_qsr.setTextSize(18);
-        lo_qsr.setEnabled(false);
+//        lo_qsr=(EditText)findViewById(R.id.lo_qsr);
+//        lo_qsr.setText(gctg.getQsr());
+//        lo_qsr.setTextColor(Color.parseColor("#000000"));
+//        lo_qsr.setTextSize(18);
+//        lo_qsr.setEnabled(false);
         lo_fcyj=(EditText)findViewById(R.id.lo_fcyj);
         lo_fcyj.setText(gctg.getFcyj());
         lo_fcyj.setTextColor(Color.parseColor("#000000"));
         lo_fcyj.setTextSize(18);
         lo_fcyj.setEnabled(false);
-        lo_fcr=(EditText)findViewById(R.id.lo_fcr);
-        lo_fcr.setText(gctg.getFcr());
-        lo_fcr.setTextColor(Color.parseColor("#000000"));
-        lo_fcr.setTextSize(18);
-        lo_fcr.setEnabled(false);
+//        lo_fcr=(EditText)findViewById(R.id.lo_fcr);
+//        lo_fcr.setText(gctg.getFcr());
+//        lo_fcr.setTextColor(Color.parseColor("#000000"));
+//        lo_fcr.setTextSize(18);
+//        lo_fcr.setEnabled(false);
         lo_cs=(EditText)findViewById(R.id.lo_cs);
         lo_cs.setText(gctg.getCs());
         lo_cs.setTextColor(Color.parseColor("#000000"));
@@ -600,5 +705,24 @@ public class LockoutActivity extends AppCompatActivity implements View.OnClickLi
         WindowManager.LayoutParams lp=this.getWindow().getAttributes();
         lp.alpha=f;
         this.getWindow().setAttributes(lp);
+    }
+    public class MyLicationListener implements BDLocationListener {
+
+        @Override
+        public void onReceiveLocation(final BDLocation bdLocation) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    latitude = bdLocation.getLatitude();
+                    longitude = bdLocation.getLongitude();
+                }
+            });
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mLocationClient.stop();
     }
 }

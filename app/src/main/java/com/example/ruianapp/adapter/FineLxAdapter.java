@@ -42,11 +42,13 @@ public class FineLxAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     class RwHolder extends RecyclerView.ViewHolder{
         private TextView Gclx_item_name;
         private TextView Gclx_item_time;
+        private TextView Gclx_item_saved;
         private View view;
         public RwHolder(View itemView) {
             super(itemView);
             Gclx_item_name=(TextView)itemView.findViewById(R.id.fine_item_name);
             Gclx_item_time=(TextView)itemView.findViewById(R.id.fine_item_time);
+            Gclx_item_saved=(TextView)itemView.findViewById(R.id.fine_item_saved);
             view=itemView;
         }
     }
@@ -64,6 +66,13 @@ public class FineLxAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
         final Gclx Gclx = GclxList.get(position);
+        if (Gclx.isSaved()){
+            ((RwHolder)holder).Gclx_item_saved.setText("已提交");
+            ((RwHolder)holder).Gclx_item_saved.setTextColor(Color.parseColor("#354B5E"));
+        }else {
+            ((RwHolder)holder).Gclx_item_saved.setText("未提交");
+            ((RwHolder)holder).Gclx_item_saved.setTextColor(Color.RED);
+        }
         SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd");
         try {

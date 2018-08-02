@@ -41,11 +41,13 @@ public class FineZgtzAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     class RwHolder extends RecyclerView.ViewHolder{
         private TextView Zgtz_item_name;
         private TextView Zgtz_item_time;
+        private TextView Zgtz_item_saved;
         private View view;
         public RwHolder(View itemView) {
             super(itemView);
             Zgtz_item_name=(TextView)itemView.findViewById(R.id.fine_item_name);
             Zgtz_item_time= (TextView) itemView.findViewById(R.id.fine_item_time);
+            Zgtz_item_saved= (TextView) itemView.findViewById(R.id.fine_item_saved);
             view = itemView;
         }
     }
@@ -63,6 +65,13 @@ public class FineZgtzAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
         final Zgtz Zgtz = ZgtzList.get(position);
+        if (Zgtz.isSaved()){
+            ((RwHolder)holder).Zgtz_item_saved.setText("已提交");
+            ((RwHolder)holder).Zgtz_item_saved.setTextColor(Color.parseColor("#354B5E"));
+        }else {
+            ((RwHolder)holder).Zgtz_item_saved.setText("未提交");
+            ((RwHolder)holder).Zgtz_item_saved.setTextColor(Color.RED);
+        }
         SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd");
         try {

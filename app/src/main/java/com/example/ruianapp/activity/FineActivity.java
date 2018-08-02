@@ -19,6 +19,14 @@ import com.example.ruianapp.adapter.FineLxAdapter;
 import com.example.ruianapp.adapter.FineTgAdapter;
 import com.example.ruianapp.adapter.FineZgtzAdapter;
 import com.example.ruianapp.adapter.NewsAdapter;
+import com.example.ruianapp.bean.EnterprisesList;
+import com.example.ruianapp.bean.Gcfk;
+import com.example.ruianapp.bean.Gclx;
+import com.example.ruianapp.bean.Gctg;
+import com.example.ruianapp.bean.Zgtz;
+
+import org.litepal.LitePal;
+import org.litepal.crud.DataSupport;
 
 import java.io.IOException;
 
@@ -42,24 +50,6 @@ public class FineActivity extends AppCompatActivity {
         linearLayoutManager=new LinearLayoutManager(this);
         recyclerView.setLayoutManager(linearLayoutManager);
         intent = getIntent();
-        switch (intent.getStringExtra("type")){
-            case "gcfk":
-                actionBar.setTitle("工程罚款通知单");
-                initGcfkData();
-                break;
-            case "lx":
-                actionBar.setTitle("工程联系单");
-                initGclxData();
-                break;
-            case "tg":
-                actionBar.setTitle("工程停工通知单");
-                initGctgData();
-                break;
-            case "zg":
-                actionBar.setTitle("整改通知单");
-                initZgztData();
-                break;
-        }
     }
     private void initGcfkData(){
         new Thread(new Runnable() {
@@ -91,6 +81,7 @@ public class FineActivity extends AppCompatActivity {
                 try{
                     FineGcfkAdapter adapter= new FineGcfkAdapter(JsonGet.myGcfk(response),FineActivity.this);
                     recyclerView.setAdapter(adapter);
+                    LitePal.saveAll(JsonGet.myGcfk(response));
                 }catch (Exception e){
                     e.printStackTrace();
                 }
@@ -128,6 +119,7 @@ public class FineActivity extends AppCompatActivity {
                 try{
                     FineLxAdapter adapter= new FineLxAdapter(JsonGet.myGclx(response),FineActivity.this);
                     recyclerView.setAdapter(adapter);
+                    LitePal.saveAll(JsonGet.myGclx(response));
                 }catch (Exception e){
                     e.printStackTrace();
                 }
@@ -165,6 +157,7 @@ public class FineActivity extends AppCompatActivity {
                 try{
                     FineTgAdapter adapter= new FineTgAdapter(JsonGet.myGctg(response),FineActivity.this);
                     recyclerView.setAdapter(adapter);
+                    LitePal.saveAll(JsonGet.myGctg(response));
                 }catch (Exception e){
                     e.printStackTrace();
                 }
@@ -199,9 +192,11 @@ public class FineActivity extends AppCompatActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                System.out.println("hhhhhhhhhhh"+response);
                 try{
                     FineZgtzAdapter adapter= new FineZgtzAdapter(JsonGet.myZgtz(response),FineActivity.this);
                     recyclerView.setAdapter(adapter);
+                    LitePal.saveAll(JsonGet.myZgtz(response));
                 }catch (Exception e){
                     e.printStackTrace();
                 }
@@ -225,15 +220,15 @@ public class FineActivity extends AppCompatActivity {
                         Intent intent1 = new Intent(FineActivity.this, ProjectFineActivity.class);
                         startActivity(intent1);
                         break;
-                    case "lx":
+                    case "gclx":
                         Intent intent2 = new Intent(FineActivity.this, ContactActivity.class);
                         startActivity(intent2);
                         break;
-                    case "tg":
+                    case "gctg":
                         Intent intent3 = new Intent(FineActivity.this, LockoutActivity.class);
                         startActivity(intent3);
                         break;
-                    case "zg":
+                    case "zgtz":
                         Intent intent4 = new Intent(FineActivity.this, SettleActivity.class);
                         startActivity(intent4);
                         break;
@@ -241,6 +236,30 @@ public class FineActivity extends AppCompatActivity {
                 break;
             case android.R.id.home:
                 finish();
+                break;
+            case R.id.fine_menu_ss:
+                switch (intent.getStringExtra("type")) {
+                    case "gcfk":
+                        Intent intent1 = new Intent(FineActivity.this, SearchActivity.class);
+                        intent1.putExtra("type","gcfk");
+                        startActivity(intent1);
+                        break;
+                    case "gclx":
+                        Intent intent2 = new Intent(FineActivity.this, SearchActivity.class);
+                        intent2.putExtra("type","gclx");
+                        startActivity(intent2);
+                        break;
+                    case "gctg":
+                        Intent intent3 = new Intent(FineActivity.this, SearchActivity.class);
+                        intent3.putExtra("type","gctg");
+                        startActivity(intent3);
+                        break;
+                    case "zgtz":
+                        Intent intent4 = new Intent(FineActivity.this, SearchActivity.class);
+                        intent4.putExtra("type","zgtz");
+                        startActivity(intent4);
+                        break;
+                }
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -253,15 +272,24 @@ public class FineActivity extends AppCompatActivity {
             case "gcfk":
                 initGcfkData();
                 break;
-            case "lx":
+            case "gclx":
                 initGclxData();
                 break;
-            case "tg":
+            case "gctg":
                 initGctgData();
                 break;
-            case "zg":
+            case "zgtz":
                 initZgztData();
                 break;
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        LitePal.deleteAll(Gcfk.class);
+        LitePal.deleteAll(Gclx.class);
+        LitePal.deleteAll(Gctg.class);
+        LitePal.deleteAll(Zgtz.class);
     }
 }

@@ -6,6 +6,7 @@ import com.example.ruianapp.activity.MainActivity;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import okhttp3.FormBody;
 import okhttp3.MediaType;
@@ -19,6 +20,7 @@ import okhttp3.RequestBody;
  */
 
 public class UtlisOkhttp {
+    private static final MediaType MEDIA_TYPE_PNG = MediaType.parse("image/png");
     public static void sendOkHttpRequest(final String address, final okhttp3.Callback callback) {
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
@@ -108,7 +110,6 @@ public class UtlisOkhttp {
         client.newCall(request).enqueue(callback);
     }
     public static void sendIdStatusOkHttpRequest(String userID,final String address, final okhttp3.Callback callback) throws IOException {
-        System.out.println("54641658951654"+address);
         OkHttpClient client = new OkHttpClient();
         RequestBody requestBody = new FormBody.Builder()
                 .add("userID",userID)
@@ -120,8 +121,8 @@ public class UtlisOkhttp {
                 .build();
         client.newCall(request).enqueue(callback);
     }
-    public static void sendImageOkHttpRequest(String imageName,final String address, final okhttp3.Callback callback) throws IOException {
-        File file = new File(Constants.path);
+    public static void sendImageOkHttpRequest(String path,String imageName,final String address, final okhttp3.Callback callback) throws IOException {
+        File file = new File(path);
         if (!file.exists())
         {
             System.out.println("文件路径不存在");
@@ -136,6 +137,40 @@ public class UtlisOkhttp {
         Request request = new Request.Builder()
                 .url(address)
                 .post(body)
+                .build();
+        client.newCall(request).enqueue(callback);
+    }
+//    public static void sendImagesOkHttpRequest(File file,final String address, final okhttp3.Callback callback) throws IOException {
+//        if (!file.exists())
+//        {
+//            System.out.println("文件路径不存在");
+//            return;
+//        }
+//        OkHttpClient client = new OkHttpClient();
+//        RequestBody requestBody = RequestBody.create(MediaType.parse("application/octet-stream"),file);
+//        RequestBody body = new MultipartBody.Builder()
+//                .setType(MultipartBody.FORM)
+//                .addFormDataPart("img", file.getName(), requestBody)
+//                .build();
+//        Request request = new Request.Builder()
+//                .url(address)
+//                .post(body)
+//                .build();
+//        client.newCall(request).enqueue(callback);
+//    }
+    public static void sendImagesOkHttpRequest(List<String>keys,List<File> files, final String address, final okhttp3.Callback callback) throws IOException {
+        OkHttpClient client = new OkHttpClient();
+        MultipartBody.Builder builder = new MultipartBody.Builder().setType(MultipartBody.FORM);
+        for (int i = 0; i <files.size() ; i++) {
+            File file=files.get(i);
+            if (file!=null) {
+                builder.addFormDataPart(keys.get(i), file.getName(), RequestBody.create(MEDIA_TYPE_PNG, file));
+            }
+        }
+        MultipartBody requestBody = builder.build();
+        Request request = new Request.Builder()
+                .url(address)
+                .post(requestBody)
                 .build();
         client.newCall(request).enqueue(callback);
     }

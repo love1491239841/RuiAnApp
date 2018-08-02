@@ -235,7 +235,7 @@ public class CommonPracticeActivity extends AppCompatActivity implements View.On
             @Override
             public void run() {
                 try {
-                    UtlisOkhttp.sendImageOkHttpRequest(enterprises.getName()+".png", Constants.CGJCIMG_URL,new okhttp3.Callback(){
+                    UtlisOkhttp.sendImageOkHttpRequest(Constants.path,enterprises.getName()+".png", Constants.CGJCIMG_URL,new okhttp3.Callback(){
                         @Override
                         public void onResponse(Call call, Response response) throws IOException {
                             String responseData=response.body().string();
