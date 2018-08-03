@@ -9,6 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.example.ruianapp.R;
 import com.example.ruianapp.Utlis.Constants;
@@ -81,7 +82,10 @@ public class FineActivity extends AppCompatActivity {
                 try{
                     FineGcfkAdapter adapter= new FineGcfkAdapter(JsonGet.myGcfk(response),FineActivity.this);
                     recyclerView.setAdapter(adapter);
-                    LitePal.saveAll(JsonGet.myGcfk(response));
+                    Toast.makeText(FineActivity.this, JsonGet.myGcfk(response).size()+"", Toast.LENGTH_SHORT).show();
+                    for (Gcfk gcfk : JsonGet.myGcfk(response)){
+                        gcfk.save();
+                    }
                 }catch (Exception e){
                     e.printStackTrace();
                 }
@@ -268,6 +272,10 @@ public class FineActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        LitePal.deleteAll(Gcfk.class);
+        LitePal.deleteAll(Gclx.class);
+        LitePal.deleteAll(Gctg.class);
+        LitePal.deleteAll(Zgtz.class);
         switch (intent.getStringExtra("type")){
             case "gcfk":
                 initGcfkData();

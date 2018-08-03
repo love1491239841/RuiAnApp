@@ -116,5 +116,11 @@ public class JsonGet {
         return gson.fromJson(data,new TypeToken<List<EnterprisesList>>(){}.getType());
     }
 
+    public static String remoJson(String jsondata) throws JSONException {
+        JSONObject jsonObject1 = new JSONObject(jsondata);
+        jsonObject1.remove("baseObjId");
+        return jsonObject1.toString();
+    }
+
 
 }

@@ -227,7 +227,7 @@ public class LockoutActivity extends AppCompatActivity implements View.OnClickLi
 //        fcr=lo_fcr.getText().toString();
         fcrq=lo_fcrq.getText().toString();
         cs=lo_cs.getText().toString();
-        add_time=new SimpleDateFormat("yyyy-MM-dd ").format(new Date());
+        add_time=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
         SharedPreferences preferences = getSharedPreferences("data",MODE_PRIVATE);
         user_id=preferences.getInt("id",0);
         update_ids=preferences.getInt("id",0)+"";
@@ -238,7 +238,7 @@ public class LockoutActivity extends AppCompatActivity implements View.OnClickLi
             Toast.makeText(this, "内容不能为空", Toast.LENGTH_SHORT).show();
         }else {
             Gson gson = new Gson();
-            Gctg gcfk = new Gctg(0,gcmc,"", gcdz, fbdw, sgdw, dgdw, zmr, fssj, problem, cljzsj, other, qfr, qfdw, qfrq, qsyj, "", qsrq, fcyj, "", fcrq, cs, add_time, user_id, update_ids,latitude+"",longitude+"",saved);
+            Gctg gcfk = new Gctg(0,gcmc,"", gcdz, fbdw, sgdw, dgdw, zmr, fssj, problem, cljzsj, other, qfr, qfdw, qfrq, qsyj, "", qsrq, fcyj, "", fcrq, cs, add_time, user_id, update_ids,latitude+"",longitude+"",saved,"","");
             final String jsonText = gson.toJson(gcfk);
             System.out.println("123456" + jsonText);
             new Thread(new Runnable() {
@@ -409,22 +409,7 @@ public class LockoutActivity extends AppCompatActivity implements View.OnClickLi
 
                     @Override
                     public void onDateSet(DatePicker arg0, int year, int monthOfYear, int dayOfMonth) {
-                        final Calendar startcal = Calendar.getInstance();
-                        startcal.set(Calendar.YEAR,year);
-                        startcal.set(Calendar.MONTH,monthOfYear);
-                        startcal.set(Calendar.DAY_OF_MONTH,dayOfMonth);
-                        TimePickerDialog dialog1 = new TimePickerDialog(LockoutActivity.this, new TimePickerDialog.OnTimeSetListener() {
-                            @Override
-                            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                                startcal.set(Calendar.HOUR_OF_DAY,hourOfDay);
-                                startcal.set(Calendar.MINUTE, minute);
-
-                                String date = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date(startcal.getTimeInMillis()));
-                                lo_qsrq.setText(date);
-
-                            }
-                        },0,0,false);
-                        dialog1.show();
+                        lo_qsrq.setText(getString(R.string.picked_date_format,year,monthOfYear, dayOfMonth));
                     }
                 };
                 DatePickerDialog dialog3=new DatePickerDialog(LockoutActivity.this, 0,listener3,mYear,mMonth,mDay);//后边三个参数为显示dialog时默认的日期，月份从0开始，0-11对应1-12个月
@@ -435,22 +420,7 @@ public class LockoutActivity extends AppCompatActivity implements View.OnClickLi
 
                     @Override
                     public void onDateSet(DatePicker arg0, int year, int monthOfYear, int dayOfMonth) {
-                        final Calendar startcal = Calendar.getInstance();
-                        startcal.set(Calendar.YEAR,year);
-                        startcal.set(Calendar.MONTH,monthOfYear);
-                        startcal.set(Calendar.DAY_OF_MONTH,dayOfMonth);
-                        TimePickerDialog dialog1 = new TimePickerDialog(LockoutActivity.this, new TimePickerDialog.OnTimeSetListener() {
-                            @Override
-                            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                                startcal.set(Calendar.HOUR_OF_DAY,hourOfDay);
-                                startcal.set(Calendar.MINUTE, minute);
-
-                                String date = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date(startcal.getTimeInMillis()));
-                                lo_fcrq.setText(date);
-
-                            }
-                        },0,0,false);
-                        dialog1.show();
+                        lo_fcrq.setText(getString(R.string.picked_date_format,year,monthOfYear, dayOfMonth));
                     }
                 };
                 DatePickerDialog dialog4=new DatePickerDialog(LockoutActivity.this, 0,listener4,mYear,mMonth,mDay);//后边三个参数为显示dialog时默认的日期，月份从0开始，0-11对应1-12个月

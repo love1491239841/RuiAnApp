@@ -66,7 +66,7 @@ public class FineTgAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
         final Gctg Gctg = GctgList.get(position);
-        if (Gctg.isSaved()){
+        if (Gctg.isSubmited()){
             ((RwHolder)holder).Gctg_item_saved.setText("已提交");
             ((RwHolder)holder).Gctg_item_saved.setTextColor(Color.parseColor("#354B5E"));
         }else {

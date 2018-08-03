@@ -26,7 +26,7 @@ public class Constants {
 
     public final static String CJGS_URL = URL+"enterprises/enterprisesList";//采集公司
     public final static String GCFK_URL = URL+"gcfktzd/saveGcfktzd";
-//    public final static String GCFK_URL = "http://192.168.43.144:8000/register";
+//    public final static String GCFK_URL = "http://192.168.43.144:8080/demo";
     public final static String GCFKList_URL = URL+"gcfktzd/gcfktzdList";
     public final static String GCLX_URL = URL+"gclxd/saveGclxd";
     public final static String GCLXList_URL = URL+"gclxd/gclxdList";

@@ -65,7 +65,7 @@ public class FineGcfkAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
         final Gcfk Gcfk = GcfkList.get(position);
-        if (Gcfk.isSaved()){
+        if (Gcfk.isSubmited()){
             ((RwHolder)holder).Gcfk_item_saved.setText("已提交");
             ((RwHolder)holder).Gcfk_item_saved.setTextColor(Color.parseColor("#354B5E"));
         }else {

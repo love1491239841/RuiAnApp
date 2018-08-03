@@ -21,6 +21,7 @@ public class MyApp extends LitePalApplication {
     @Override
     public void onCreate() {
         super.onCreate();
+        DataSupport.deleteAll(EnterprisesList.class);
         initDataBase();
     }
 
@@ -30,6 +31,7 @@ public class MyApp extends LitePalApplication {
         DataSupport.deleteAll(EnterprisesList.class);
     }
     private void initDataBase(){
+
         new Thread(new Runnable() {
             @Override
             public void run() {

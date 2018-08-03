@@ -66,7 +66,7 @@ public class FineLxAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
         final Gclx Gclx = GclxList.get(position);
-        if (Gclx.isSaved()){
+        if (Gclx.isSubmited()){
             ((RwHolder)holder).Gclx_item_saved.setText("已提交");
             ((RwHolder)holder).Gclx_item_saved.setTextColor(Color.parseColor("#354B5E"));
         }else {

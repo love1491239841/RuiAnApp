@@ -38,9 +38,11 @@ public class Zgtz extends LitePalSupport implements Serializable {
     private String updateIds;
     private String jd;
     private String wd;
-    private boolean saved;
+    private boolean submited;
+    private String word;
+    private String pdf;
 
-    public Zgtz(int id, String gcmc, String bh, String gcdz, String fbdw, String sgdw, String dgdw, String zmr, String fssj, String problem, String cljzsj, String other, String qfr, String qfdw, String qfrq, String qsyj, String qsr, String qsrq, String fcyj, String fcr, String fcrq, String cs, String addTime, int userId, String updateIds, String jd, String wd, boolean saved) {
+    public Zgtz(int id, String gcmc, String bh, String gcdz, String fbdw, String sgdw, String dgdw, String zmr, String fssj, String problem, String cljzsj, String other, String qfr, String qfdw, String qfrq, String qsyj, String qsr, String qsrq, String fcyj, String fcr, String fcrq, String cs, String addTime, int userId, String updateIds, String jd, String wd, boolean submited, String word, String pdf) {
         this.id = id;
         this.gcmc = gcmc;
         this.bh = bh;
@@ -68,7 +70,9 @@ public class Zgtz extends LitePalSupport implements Serializable {
         this.updateIds = updateIds;
         this.jd = jd;
         this.wd = wd;
-        this.saved = saved;
+        this.submited = submited;
+        this.word = word;
+        this.pdf = pdf;
     }
 
     public int getId() {
@@ -287,11 +291,27 @@ public class Zgtz extends LitePalSupport implements Serializable {
         this.wd = wd;
     }
 
-    public boolean isSaved() {
-        return saved;
+    public boolean isSubmited() {
+        return submited;
     }
 
-    public void setSaved(boolean saved) {
-        this.saved = saved;
+    public void setSubmited(boolean submited) {
+        this.submited = submited;
+    }
+
+    public String getWord() {
+        return word;
+    }
+
+    public void setWord(String word) {
+        this.word = word;
+    }
+
+    public String getPdf() {
+        return pdf;
+    }
+
+    public void setPdf(String pdf) {
+        this.pdf = pdf;
     }
 }

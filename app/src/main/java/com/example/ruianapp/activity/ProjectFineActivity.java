@@ -42,8 +42,10 @@ import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
+import com.bumptech.glide.Glide;
 import com.example.ruianapp.R;
 import com.example.ruianapp.Utlis.Constants;
+import com.example.ruianapp.Utlis.GetImageView;
 import com.example.ruianapp.Utlis.JsonGet;
 import com.example.ruianapp.Utlis.UtlisOkhttp;
 import com.example.ruianapp.bean.EnterprisesList;
@@ -51,6 +53,8 @@ import com.example.ruianapp.bean.Gcfk;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.litepal.crud.DataSupport;
 
 import java.io.File;
@@ -104,7 +108,7 @@ public class ProjectFineActivity extends AppCompatActivity implements View.OnCli
         }
         gcfk = (Gcfk) getIntent().getSerializableExtra("gcfk");
         if (gcfk !=null){
-            if (gcfk.isSaved()){
+            if (gcfk.isSubmited()){
                 initobserve();
             }else {
                 initSaved();
@@ -243,9 +247,9 @@ public class ProjectFineActivity extends AppCompatActivity implements View.OnCli
         zmr=prfi_zmr.getText().toString();
         fssj=prfi_fssj.getText().toString();
         problem=prfi_problem.getText().toString();
-        xx=Double.parseDouble(prfi_xx.getText().toString());
+        xx=Double.valueOf(prfi_xx.getText().toString());
         dx=change(xx);
-        qfr="江苏瑞安安全科技发展有限公司";
+        qfr="";
         qfdw="江苏瑞安安全科技发展有限公司";
         qfrq=prfi_qfrq.getText().toString();
         sjrq=prfi_sjrq.getText().toString();
@@ -260,21 +264,15 @@ public class ProjectFineActivity extends AppCompatActivity implements View.OnCli
     * 下面进行网络请求
     *
     * */
-    private void okHttp(boolean saved){
+    private void okHttp(boolean saved) throws JSONException {
         if (gcmc.length()==0 || gcdz.length()==0 || fbdw.length()==0 || sgdw.length()==0 || dgdw.length()==0 || zmr.length()==0 || fssj.length()==0 ||
                 fssj.length()==0 || problem.length()==0 || dx.length()==0){
             Toast.makeText(this, "内容不能为空", Toast.LENGTH_SHORT).show();
         }else {
             Gson gson = new Gson();
-            Gcfk gcfk = new Gcfk(0,gcmc,"",gcdz,fbdw,sgdw,dgdw,zmr,fssj,problem,dx,xx,qfr,qfdw,qfrq,"dd",sjrq,"dd",sjrq2,add_time,user_id,update_ids,latitude+"",longitude+"",saved);
-            final String json=gson.toJson(gcfk);
-//            Map<String, Object> map = new HashMap<String, Object>();
-//            map.put("userId", user_id);
-//            map.put("obj", gcfk);
-//            Gson gson2 = new GsonBuilder().enableComplexMapKeySerialization().create();
-//            final String jsonText = gson2.toJson(map);
-//            System.out.println("12345678941233"+jsonText);
-            System.out.println("asdfghjklddd"+json);
+            Gcfk gcfk = new Gcfk(0,gcmc,"",gcdz,fbdw,sgdw,dgdw,zmr,fssj,problem,dx,xx,qfr,qfdw,qfrq,"",sjrq,"",sjrq2,add_time,user_id,update_ids,latitude+"",longitude+"",saved,"","");
+            final String json= JsonGet.remoJson(gson.toJson(gcfk));
+            System.out.println("asdfghjkl1"+json);
             new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -374,16 +372,20 @@ public class ProjectFineActivity extends AppCompatActivity implements View.OnCli
                         .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                if (prfi_qfr.getDrawable()==null){
+                                if (prfi_qfr.getDrawable()==null || prfi_sjr.getDrawable()==null || prfi_sjr2.getDrawable()==null){
                                     Toast.makeText(ProjectFineActivity.this, "未签名", Toast.LENGTH_SHORT).show();
                                 }else {
                                     if ((xx+"").length()==0 || prfi_qfrq.getText().length()==0 ||
                                             prfi_sjrq.getText().length()==0 || prfi_sjrq2.getText().length()==0){
                                         Toast.makeText(ProjectFineActivity.this, "日期和罚款金额不能为空", Toast.LENGTH_SHORT).show();
                                     }else {
-//                                        initData();
-                                        okhttpimage();
-//                                        okHttp(true);
+                                        initData();
+//                                        okhttpimage();
+                                        try {
+                                            okHttp(true);
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
+                                        }
                                     }
                                 }
                             }
@@ -398,12 +400,21 @@ public class ProjectFineActivity extends AppCompatActivity implements View.OnCli
                         .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                if ((xx+"").length()==0 || prfi_qfrq.getText().length()==0 ||
-                                        prfi_sjrq.getText().length()==0 || prfi_sjrq2.getText().length()==0){
-                                    Toast.makeText(ProjectFineActivity.this, "日期和罚款金额不能为空", Toast.LENGTH_SHORT).show();
+                                if (prfi_qfr.getDrawable()==null || prfi_sjr.getDrawable()==null || prfi_sjr2.getDrawable()==null){
+                                    Toast.makeText(ProjectFineActivity.this, "未签名", Toast.LENGTH_SHORT).show();
                                 }else {
-                                    initData();
-                                    okHttp(false);
+                                    if ((xx+"").length()==0 || prfi_qfrq.getText().length()==0 ||
+                                            prfi_sjrq.getText().length()==0 || prfi_sjrq2.getText().length()==0){
+                                        Toast.makeText(ProjectFineActivity.this, "日期和罚款金额不能为空", Toast.LENGTH_SHORT).show();
+                                    }else {
+                                        initData();
+//                                        okhttpimage();
+                                        try {
+                                            okHttp(true);
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
                                 }
                             }
                         })
@@ -418,17 +429,8 @@ public class ProjectFineActivity extends AppCompatActivity implements View.OnCli
                         startcal.set(Calendar.YEAR,year);
                         startcal.set(Calendar.MONTH,monthOfYear);
                         startcal.set(Calendar.DAY_OF_MONTH,dayOfMonth);
-                        TimePickerDialog dialog1 = new TimePickerDialog(ProjectFineActivity.this, new TimePickerDialog.OnTimeSetListener() {
-                            @Override
-                            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                                startcal.set(Calendar.HOUR_OF_DAY,hourOfDay);
-                                startcal.set(Calendar.MINUTE, minute);
-                                String date = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date(startcal.getTimeInMillis()));
-                                prfi_qfrq.setText(date);
-
-                            }
-                        },0,0,false);
-                        dialog1.show();
+                        String date = new java.text.SimpleDateFormat("yyyy-MM-dd").format(new java.util.Date(startcal.getTimeInMillis()));
+                        prfi_qfrq.setText(date);
                     }
                 };
                 DatePickerDialog dialog1=new DatePickerDialog(ProjectFineActivity.this, 0,listener1,mYear,mMonth,mDay);//后边三个参数为显示dialog时默认的日期，月份从0开始，0-11对应1-12个月
@@ -443,18 +445,8 @@ public class ProjectFineActivity extends AppCompatActivity implements View.OnCli
                         startcal.set(Calendar.YEAR,year);
                         startcal.set(Calendar.MONTH,monthOfYear);
                         startcal.set(Calendar.DAY_OF_MONTH,dayOfMonth);
-                        TimePickerDialog dialog1 = new TimePickerDialog(ProjectFineActivity.this, new TimePickerDialog.OnTimeSetListener() {
-                            @Override
-                            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                                startcal.set(Calendar.HOUR_OF_DAY,hourOfDay);
-                                startcal.set(Calendar.MINUTE, minute);
-
-                                String date = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date(startcal.getTimeInMillis()));
-                                prfi_sjrq.setText(date);
-
-                            }
-                        },0,0,false);
-                        dialog1.show();
+                        String date = new java.text.SimpleDateFormat("yyyy-MM-dd").format(new java.util.Date(startcal.getTimeInMillis()));
+                       prfi_sjrq.setText(date);
                     }
                 };
                 DatePickerDialog dialog2=new DatePickerDialog(ProjectFineActivity.this, 0,listener2,mYear,mMonth,mDay);//后边三个参数为显示dialog时默认的日期，月份从0开始，0-11对应1-12个月
@@ -469,18 +461,8 @@ public class ProjectFineActivity extends AppCompatActivity implements View.OnCli
                         startcal.set(Calendar.YEAR,year);
                         startcal.set(Calendar.MONTH,monthOfYear);
                         startcal.set(Calendar.DAY_OF_MONTH,dayOfMonth);
-                        TimePickerDialog dialog1 = new TimePickerDialog(ProjectFineActivity.this, new TimePickerDialog.OnTimeSetListener() {
-                            @Override
-                            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                                startcal.set(Calendar.HOUR_OF_DAY,hourOfDay);
-                                startcal.set(Calendar.MINUTE, minute);
-
-                                String date = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date(startcal.getTimeInMillis()));
-                                prfi_sjrq2.setText(date);
-
-                            }
-                        },0,0,false);
-                        dialog1.show();
+                        String date = new java.text.SimpleDateFormat("yyyy-MM-dd").format(new java.util.Date(startcal.getTimeInMillis()));
+                        prfi_sjrq2.setText(date);
                     }
                 };
                 DatePickerDialog dialog3=new DatePickerDialog(ProjectFineActivity.this, 0,listener3,mYear,mMonth,mDay);//后边三个参数为显示dialog时默认的日期，月份从0开始，0-11对应1-12个月
@@ -676,6 +658,7 @@ public class ProjectFineActivity extends AppCompatActivity implements View.OnCli
         prfi_sjrq2.setEnabled(false);
         prfi_sjrq2.setTextColor(Color.parseColor("#000000"));
         prfi_sjrq2.setTextSize(18);
+
     }
     private void initSaved(){
         if (Build.VERSION.SDK_INT >= 21) {
@@ -691,19 +674,8 @@ public class ProjectFineActivity extends AppCompatActivity implements View.OnCli
         projectfine_tj= (LinearLayout) findViewById(R.id.projectfine_tj);
         projectfine_bc= (LinearLayout) findViewById(R.id.projectfine_bc);
         projectfine_fh.setOnClickListener(this);
-
-        projectfine_tj.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(ProjectFineActivity.this, "提交过后不能修改", Toast.LENGTH_SHORT).show();
-            }
-        });
-        projectfine_bc.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(ProjectFineActivity.this, "不能重复保存", Toast.LENGTH_SHORT).show();
-            }
-        });
+        projectfine_tj.setOnClickListener(this);
+        projectfine_bc.setOnClickListener(this);
         projectfine_titlename=(TextView)findViewById(R.id.projectfine_titlename);
         projectfine_titlename.setText(gcfk.getGcmc());
         prfi_gcmc=(EditText)findViewById(R.id.pr_fi_name);
@@ -718,9 +690,7 @@ public class ProjectFineActivity extends AppCompatActivity implements View.OnCli
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                System.out.println("123456776543");
                 String name = prfi_gcmc.getText().toString();
-                System.out.println("123456776543");
                 List<EnterprisesList>enterprisesLists = new ArrayList<>();
                 Cursor cursor = DataSupport.findBySQL("SELECT * FROM enterpriseslist WHERE NAME LIKE '%"+name+"%' limit 5");
                 if (cursor!=null){
@@ -824,8 +794,18 @@ public class ProjectFineActivity extends AppCompatActivity implements View.OnCli
         prfi_sjrq2.setOnClickListener(this);
         prfi_qfr= (ImageView) findViewById(R.id.pr_fi_qfr);
         prfi_qfr.setOnClickListener(this);
-
-
+        prfi_sjr = (ImageView) findViewById(R.id.pr_fi_sjr);
+        prfi_sjr2= (ImageView) findViewById(R.id.pr_fi_sjr2);
+        prfi_sjr.setOnClickListener(this);
+        prfi_sjr2.setOnClickListener(this);
+//        //        以下是加载签名
+//        GetImageView getImageView = new GetImageView();
+//        getImageView.getImageView(this,"","qfr.png");
+//        getImageView.getImageView(this,"","sjr.png");
+//        getImageView.getImageView(this,"","sjr2.png");
+//        Glide.with(this).load("").into(prfi_qfr);
+//        Glide.with(this).load("").into(prfi_sjr);
+//        Glide.with(this).load("").into(prfi_sjr2);
     }
     private void initSearch(final List<EnterprisesList> enterprisesLists){
         String[] data=new String[enterprisesLists.size()];

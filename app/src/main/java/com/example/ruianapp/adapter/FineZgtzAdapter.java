@@ -65,7 +65,7 @@ public class FineZgtzAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
         final Zgtz Zgtz = ZgtzList.get(position);
-        if (Zgtz.isSaved()){
+        if (Zgtz.isSubmited()){
             ((RwHolder)holder).Zgtz_item_saved.setText("已提交");
             ((RwHolder)holder).Zgtz_item_saved.setTextColor(Color.parseColor("#354B5E"));
         }else {
