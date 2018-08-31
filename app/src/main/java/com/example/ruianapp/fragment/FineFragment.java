@@ -256,4 +256,13 @@ public class FineFragment extends Fragment implements View.OnClickListener{
             }
         });
     }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        initGcfkData();
+        initGclxData();
+        initGctgData();
+        initZgztData();
+    }
 }

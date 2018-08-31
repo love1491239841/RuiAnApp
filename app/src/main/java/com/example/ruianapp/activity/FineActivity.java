@@ -82,7 +82,6 @@ public class FineActivity extends AppCompatActivity {
                 try{
                     FineGcfkAdapter adapter= new FineGcfkAdapter(JsonGet.myGcfk(response),FineActivity.this);
                     recyclerView.setAdapter(adapter);
-                    Toast.makeText(FineActivity.this, JsonGet.myGcfk(response).size()+"", Toast.LENGTH_SHORT).show();
                     for (Gcfk gcfk : JsonGet.myGcfk(response)){
                         gcfk.save();
                     }

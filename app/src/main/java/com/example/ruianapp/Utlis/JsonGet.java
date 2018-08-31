@@ -15,8 +15,10 @@ import com.example.ruianapp.bean.News;
 import com.example.ruianapp.bean.Userinfo;
 import com.example.ruianapp.bean.Zgtz;
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.reflect.TypeToken;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -121,6 +123,10 @@ public class JsonGet {
         jsonObject1.remove("baseObjId");
         return jsonObject1.toString();
     }
-
-
+    public static JSONArray getpath(String jsondata) throws JSONException {
+        JSONObject jsonObject1 = new JSONObject(jsondata);
+        String data = jsonObject1.getString("data");
+        JSONArray jsonArray= new JSONArray(data);
+        return jsonArray;
+    }
 }

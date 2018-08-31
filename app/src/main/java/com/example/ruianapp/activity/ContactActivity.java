@@ -12,11 +12,14 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +31,7 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
@@ -38,8 +42,12 @@ import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.SimpleTarget;
 import com.example.ruianapp.R;
 import com.example.ruianapp.Utlis.Constants;
+import com.example.ruianapp.Utlis.GetImageView;
 import com.example.ruianapp.Utlis.JsonGet;
 import com.example.ruianapp.Utlis.UtlisOkhttp;
 import com.example.ruianapp.bean.EnterprisesList;
@@ -47,6 +55,7 @@ import com.example.ruianapp.bean.Gclx;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import org.json.JSONArray;
 import org.litepal.crud.DataSupport;
 
 import java.io.File;
@@ -63,12 +72,9 @@ import okhttp3.Call;
 import okhttp3.Response;
 
 public class ContactActivity extends AppCompatActivity implements View.OnClickListener{
-    private ImageView contact_fh;
-    private TextView contact_titleName;
-    private ImageView contact_tj;
     private EditText co_gcmc,co_gcdz,co_fbdw,co_sgdw,co_dgdw,co_zmr,co_problem;
     private Button co_qfrq,co_sjrq,co_sjrq2;
-    private String gcmc,gcdz,fbdw,sgdw,dgdw,zmr,problem,qfr,qfdw,sjr,sjr2,update_ids;
+    private String bh,gcmc,gcdz,fbdw,sgdw,dgdw,zmr,problem,qfr,qfdw,sjr,sjr2,update_ids;
     private String qfrq,sjrq,sjrq2,add_time;
     private int user_id;
     private int mYear;
@@ -83,6 +89,7 @@ public class ContactActivity extends AppCompatActivity implements View.OnClickLi
     private LocationClient mLocationClient;
     private double latitude;
     private double longitude;
+    private int id;
 
 
 
@@ -90,15 +97,28 @@ public class ContactActivity extends AppCompatActivity implements View.OnClickLi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contact);
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
         mLocationClient = new LocationClient(getApplicationContext());
         mLocationClient.registerLocationListener(new MyLicationListener());
 
         gclx = (Gclx) getIntent().getSerializableExtra("lx");
         if (gclx != null){
-            initobserve();
+            if (gclx.isSubmited()){
+                initobserve();
+            }else {
+                bh=gclx.getBh();
+                requestLocation();
+                id=gclx.getId();
+                initSaved();
+
+            }
         }else {
-            initView();
+            bh="";
+            id=0;
             requestLocation();
+            initView();
+
         }
 
     }
@@ -109,26 +129,14 @@ public class ContactActivity extends AppCompatActivity implements View.OnClickLi
     private void initLocation(){
         LocationClientOption option = new LocationClientOption();
         option.setCoorType("bd09ll");
-//        option.setScanSpan(5000);
         option.setIsNeedAddress(true);
         mLocationClient.setLocOption(option);
     }
     private void initView(){
-        if (Build.VERSION.SDK_INT >= 21) {
-            View decorView = getWindow().getDecorView();
-            decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
-            getWindow().setStatusBarColor(Color.TRANSPARENT);
-        }
         Calendar c = Calendar.getInstance();
         mYear = c.get(Calendar.YEAR);
         mMonth = c.get(Calendar.MONTH);
         mDay = c.get(Calendar.DAY_OF_MONTH);
-        contact_fh=(ImageView)findViewById(R.id.contact_fh);
-        contact_tj=(ImageView)findViewById(R.id.contact_tj);
-        contact_titleName=(TextView)findViewById(R.id.contact_titlename);
-        contact_fh.setOnClickListener(this);
-        contact_tj.setOnClickListener(this);
-        contact_titleName.setText("工程联系单");
         co_gcmc=(EditText)findViewById(R.id.co_name);
         co_gcmc.addTextChangedListener(new TextWatcher() {
             @Override
@@ -220,51 +228,42 @@ public class ContactActivity extends AppCompatActivity implements View.OnClickLi
         dgdw=co_dgdw.getText().toString();
         zmr=co_zmr.getText().toString();
         problem=co_problem.getText().toString();
-        qfr="江苏瑞安安全科技发展有限公司";
+        qfr="";
+        sjr="";
+        sjr2="";
         qfdw="江苏瑞安安全科技发展有限公司";
         qfrq=co_qfrq.getText().toString();
         sjrq=co_sjrq.getText().toString();
         sjrq2=co_sjrq2.getText().toString();
-        add_time=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+        add_time=new SimpleDateFormat("yyyy-MM-dd").format(new Date());
         SharedPreferences preferences = getSharedPreferences("data",MODE_PRIVATE);
         user_id=preferences.getInt("id",0);
         update_ids=preferences.getInt("id",0)+"";
     }
     private void okHttp(boolean saved){
-        if (gcmc.length()==0 || gcdz.length()==0 || fbdw.length()==0 || sgdw.length()==0 || dgdw.length()==0 || zmr.length()==0 || problem.length()==0 || co_qfrq.getText().length()==0 ||
-                co_sjrq.getText().length()==0 || co_sjrq2.getText().length()==0){
-            Toast.makeText(this, "内容不能为空", Toast.LENGTH_SHORT).show();
-        }else {
-            Gson gson = new Gson();
-            Gclx gcfk = new Gclx(0,gcmc,"",gcdz,fbdw,sgdw,dgdw,zmr,problem,qfr,qfdw,qfrq,"",sjrq,"",sjrq2,add_time,user_id,update_ids,latitude+"",longitude+"",saved,"","");
-            final String jsonText=gson.toJson(gcfk);
-//            Map<String, Object> map = new HashMap<String, Object>();
-//            map.put("userId", user_id);
-//            map.put("obj", gcfk);
-//            Gson gson2 = new GsonBuilder().enableComplexMapKeySerialization().create();
-//            final String jsonText = gson2.toJson(map);
-//            System.out.println("hcbsjhbc"+jsonText);
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        UtlisOkhttp.sendUserJsonOkHttpRequest(jsonText, Constants.GCLX_URL,new okhttp3.Callback(){
-                            @Override
-                            public void onResponse(Call call, Response response) throws IOException {
-                                String responseData=response.body().string();
-                                showResponse(responseData);
-                            }
-                            @Override
-                            public void onFailure(Call call,IOException e){
-                            }
-                        });
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-
+        Gson gson = new Gson();
+        Gclx gcfk = new Gclx(id,gcmc,bh,gcdz,fbdw,sgdw,dgdw,zmr,problem,qfr,qfdw,qfrq,sjr,sjrq,sjr2,sjrq2,add_time,user_id,update_ids,latitude+"",longitude+"",saved,"","");
+        final String jsonText=gson.toJson(gcfk);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    UtlisOkhttp.sendUserJsonOkHttpRequest(jsonText, Constants.GCLX_URL,new okhttp3.Callback(){
+                        @Override
+                        public void onResponse(Call call, Response response) throws IOException {
+                            String responseData=response.body().string();
+                            showResponse(responseData);
+                        }
+                        @Override
+                        public void onFailure(Call call,IOException e){
+                        }
+                    });
+                }catch (Exception e){
+                    e.printStackTrace();
                 }
-            }).start();
-        }
+
+            }
+        }).start();
     }
     private void showResponse(final String response) {
         //在子线程中更新UI
@@ -277,7 +276,7 @@ public class ContactActivity extends AppCompatActivity implements View.OnClickLi
             }
         });
     }
-    private void okhttpimage(){
+    private void okhttpimage(final boolean saved){
         final List<File> files = new ArrayList<>();
         files.add(new File(Constants.path+"qfr.png"));
         files.add(new File(Constants.path+"sjr.png"));
@@ -294,7 +293,7 @@ public class ContactActivity extends AppCompatActivity implements View.OnClickLi
                         @Override
                         public void onResponse(Call call, Response response) throws IOException {
                             String responseData=response.body().string();
-                            showimgResponse(responseData);
+                            showimgResponse(responseData,saved);
                         }
                         @Override
                         public void onFailure(Call call,IOException e){
@@ -308,15 +307,29 @@ public class ContactActivity extends AppCompatActivity implements View.OnClickLi
             }
         }).start();
     }
-    private void showimgResponse(final String response) {
+    private void showimgResponse(final String response,boolean saved) {
         //在子线程中更新UI
         System.out.println("asdfghjkl2"+response);
+        try {
+            JSONArray jsonArray = JsonGet.getpath(response);
+            qfr=jsonArray.getString(0);
+            sjr=jsonArray.getString(1);
+            sjr2=jsonArray.getString(2);
+            okHttp(saved);
+        }catch (Exception e){
+            e.printStackTrace();
+        };
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.finesave_menu,menu);
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
-    public void onClick(View view) {
-        switch (view.getId()){
-            case R.id.contact_fh:
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case android.R.id.home:
                 AlertDialog.Builder builder=new AlertDialog.Builder(this);
                 builder.setTitle("提示：");
                 builder.setMessage("您确定退出？");
@@ -333,27 +346,139 @@ public class ContactActivity extends AppCompatActivity implements View.OnClickLi
                 //显示提示框
                 builder.show();
                 break;
-            case R.id.contact_tj:
-                new AlertDialog.Builder(this)
-                        .setTitle("提示")
-                        .setMessage("是否提交，提交后无法修改" )
-                        .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                okhttpimage();
-//                                if (co_qfrq.getText().length()==0 ||
-//                                        co_sjrq.getText().length()==0 || co_sjrq2.getText().length()==0){
-//                                    Toast.makeText(ContactActivity.this, "日期不能为空", Toast.LENGTH_SHORT).show();
-//                                }else {
-//                                    initData();
-//
-//                                    okHttp(true);
-//                                }
-                            }
-                        })
-                        .setNegativeButton("取消", null)
-                        .show();
+            case R.id.finesave_menu_bc:
+                if (gclx==null){
+                    new AlertDialog.Builder(this)
+                            .setTitle("提示")
+                            .setMessage("是否保存，保存后可以修改" )
+                            .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    okhttpimage(false);
+                                    if (co_qfr.getDrawable()==null||co_sjr.getDrawable()==null||co_sjr2.getDrawable()==null){
+                                        Toast.makeText(ContactActivity.this, "未签名", Toast.LENGTH_SHORT).show();
+                                    }else {
+                                        if (co_qfrq.getText().length()==0 ||
+                                                co_sjrq.getText().length()==0 || co_sjrq2.getText().length()==0){
+                                            Toast.makeText(ContactActivity.this, "日期不能为空", Toast.LENGTH_SHORT).show();
+                                        }else {
+                                            initData();
+                                            if (gcmc.length()==0 || gcdz.length()==0 || fbdw.length()==0 || sgdw.length()==0 || dgdw.length()==0 || zmr.length()==0 || problem.length()==0 || co_qfrq.getText().length()==0 ||
+                                                    co_sjrq.getText().length()==0 || co_sjrq2.getText().length()==0){
+                                                Toast.makeText(ContactActivity.this, "内容不能为空", Toast.LENGTH_SHORT).show();
+                                            }else {
+                                                okhttpimage(false);
+                                            }
+                                        }
+                                    }
+                                }
+                            })
+                            .setNegativeButton("取消", null)
+                            .show();
+                }else {
+                    if (gclx.isSubmited()){
+                        Toast.makeText(this, "提交过后不能修改", Toast.LENGTH_SHORT).show();
+                    }else {
+                        new AlertDialog.Builder(this)
+                                .setTitle("提示")
+                                .setMessage("是否保存，保存后可以修改" )
+                                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        okhttpimage(false);
+                                        if (co_qfr.getDrawable()==null||co_sjr.getDrawable()==null||co_sjr2.getDrawable()==null){
+                                            Toast.makeText(ContactActivity.this, "未签名", Toast.LENGTH_SHORT).show();
+                                        }else {
+                                            if (co_qfrq.getText().length()==0 ||
+                                                    co_sjrq.getText().length()==0 || co_sjrq2.getText().length()==0){
+                                                Toast.makeText(ContactActivity.this, "日期不能为空", Toast.LENGTH_SHORT).show();
+                                            }else {
+                                                initData();
+                                                if (gcmc.length()==0 || gcdz.length()==0 || fbdw.length()==0 || sgdw.length()==0 || dgdw.length()==0 || zmr.length()==0 || problem.length()==0 || co_qfrq.getText().length()==0 ||
+                                                        co_sjrq.getText().length()==0 || co_sjrq2.getText().length()==0){
+                                                    Toast.makeText(ContactActivity.this, "内容不能为空", Toast.LENGTH_SHORT).show();
+                                                }else {
+                                                    okhttpimage(false);
+                                                }
+                                            }
+                                        }
+                                    }
+                                })
+                                .setNegativeButton("取消", null)
+                                .show();
+                    }
+                }
+
                 break;
+            case R.id.finesave_menu_tj:
+                if (gclx==null){
+                    new AlertDialog.Builder(this)
+                            .setTitle("提示")
+                            .setMessage("是否提交，提交后无法修改" )
+                            .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    if (co_qfr.getDrawable()==null||co_sjr.getDrawable()==null||co_sjr2.getDrawable()==null){
+                                        Toast.makeText(ContactActivity.this, "未签名", Toast.LENGTH_SHORT).show();
+                                    }else {
+                                        if (co_qfrq.getText().length()==0 ||
+                                                co_sjrq.getText().length()==0 || co_sjrq2.getText().length()==0){
+                                            Toast.makeText(ContactActivity.this, "日期不能为空", Toast.LENGTH_SHORT).show();
+                                        }else {
+                                            initData();
+                                            if (gcmc.length()==0 || gcdz.length()==0 || fbdw.length()==0 || sgdw.length()==0 || dgdw.length()==0 || zmr.length()==0 || problem.length()==0 || co_qfrq.getText().length()==0 ||
+                                                    co_sjrq.getText().length()==0 || co_sjrq2.getText().length()==0){
+                                                Toast.makeText(ContactActivity.this, "内容不能为空", Toast.LENGTH_SHORT).show();
+                                            }else {
+                                                okhttpimage(true);
+                                            }
+                                        }
+                                    }
+                                }
+                            })
+                            .setNegativeButton("取消", null)
+                            .show();
+                }else {
+                    if (gclx.isSubmited()){
+                        Toast.makeText(this, "提交过后不能修改", Toast.LENGTH_SHORT).show();
+                    }else {
+                        new AlertDialog.Builder(this)
+                                .setTitle("提示")
+                                .setMessage("是否提交，提交后无法修改" )
+                                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        if (co_qfr.getDrawable()==null||co_sjr.getDrawable()==null||co_sjr2.getDrawable()==null){
+                                            Toast.makeText(ContactActivity.this, "未签名", Toast.LENGTH_SHORT).show();
+                                        }else {
+                                            if (co_qfrq.getText().length()==0 ||
+                                                    co_sjrq.getText().length()==0 || co_sjrq2.getText().length()==0){
+                                                Toast.makeText(ContactActivity.this, "日期不能为空", Toast.LENGTH_SHORT).show();
+                                            }else {
+                                                initData();
+                                                if (gcmc.length()==0 || gcdz.length()==0 || fbdw.length()==0 || sgdw.length()==0 || dgdw.length()==0 || zmr.length()==0 || problem.length()==0 || co_qfrq.getText().length()==0 ||
+                                                        co_sjrq.getText().length()==0 || co_sjrq2.getText().length()==0){
+                                                    Toast.makeText(ContactActivity.this, "内容不能为空", Toast.LENGTH_SHORT).show();
+                                                }else {
+                                                    okhttpimage(true);
+                                                }
+                                            }
+                                        }
+                                    }
+                                })
+                                .setNegativeButton("取消", null)
+                                .show();
+                    }
+
+                }
+
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()){
             case R.id.co_time:
                 DatePickerDialog.OnDateSetListener listener1=new DatePickerDialog.OnDateSetListener() {
 
@@ -363,18 +488,8 @@ public class ContactActivity extends AppCompatActivity implements View.OnClickLi
                         startcal.set(Calendar.YEAR,year);
                         startcal.set(Calendar.MONTH,monthOfYear);
                         startcal.set(Calendar.DAY_OF_MONTH,dayOfMonth);
-                        TimePickerDialog dialog1 = new TimePickerDialog(ContactActivity.this, new TimePickerDialog.OnTimeSetListener() {
-                            @Override
-                            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                                startcal.set(Calendar.HOUR_OF_DAY,hourOfDay);
-                                startcal.set(Calendar.MINUTE, minute);
-
-                                String date = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date(startcal.getTimeInMillis()));
-                                co_qfrq.setText(date);
-
-                            }
-                        },0,0,false);
-                        dialog1.show();
+                        String date = new java.text.SimpleDateFormat("yyyy-MM-dd").format(new java.util.Date(startcal.getTimeInMillis()));
+                        co_qfrq.setText(date);
                     }
                 };
                 DatePickerDialog dialog1=new DatePickerDialog(ContactActivity.this, 0,listener1,mYear,mMonth,mDay);//后边三个参数为显示dialog时默认的日期，月份从0开始，0-11对应1-12个月
@@ -385,7 +500,12 @@ public class ContactActivity extends AppCompatActivity implements View.OnClickLi
 
                     @Override
                     public void onDateSet(DatePicker arg0, int year, int monthOfYear, int dayOfMonth) {
-                        co_sjrq.setText(getString(R.string.picked_date_format,year,monthOfYear, dayOfMonth));
+                        final Calendar startcal = Calendar.getInstance();
+                        startcal.set(Calendar.YEAR,year);
+                        startcal.set(Calendar.MONTH,monthOfYear);
+                        startcal.set(Calendar.DAY_OF_MONTH,dayOfMonth);
+                        String date = new java.text.SimpleDateFormat("yyyy-MM-dd").format(new java.util.Date(startcal.getTimeInMillis()));
+                        co_sjrq.setText(date);
                     }
                 };
                 DatePickerDialog dialog2=new DatePickerDialog(ContactActivity.this, 0,listener2,mYear,mMonth,mDay);//后边三个参数为显示dialog时默认的日期，月份从0开始，0-11对应1-12个月
@@ -396,7 +516,12 @@ public class ContactActivity extends AppCompatActivity implements View.OnClickLi
 
                     @Override
                     public void onDateSet(DatePicker arg0, int year, int monthOfYear, int dayOfMonth) {
-                        co_sjrq2.setText(getString(R.string.picked_date_format,year,monthOfYear, dayOfMonth));
+                        final Calendar startcal = Calendar.getInstance();
+                        startcal.set(Calendar.YEAR,year);
+                        startcal.set(Calendar.MONTH,monthOfYear);
+                        startcal.set(Calendar.DAY_OF_MONTH,dayOfMonth);
+                        String date = new java.text.SimpleDateFormat("yyyy-MM-dd").format(new java.util.Date(startcal.getTimeInMillis()));
+                        co_sjrq2.setText(date);
                     }
                 };
                 DatePickerDialog dialog3=new DatePickerDialog(ContactActivity.this, 0,listener3,mYear,mMonth,mDay);//后边三个参数为显示dialog时默认的日期，月份从0开始，0-11对应1-12个月
@@ -444,32 +569,7 @@ public class ContactActivity extends AppCompatActivity implements View.OnClickLi
         }
         return super.onKeyDown(keyCode, event);
     }
-    public static Date stringToDate(String source, String pattern) {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
-        Date date = null;
-        try {
-            date = simpleDateFormat.parse(source);
-        } catch (Exception e) {
-        }
-        return date;
-    }
     private void initobserve(){
-        if (Build.VERSION.SDK_INT >= 21) {
-            View decorView = getWindow().getDecorView();
-            decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
-            getWindow().setStatusBarColor(Color.TRANSPARENT);
-        }
-        contact_fh=(ImageView)findViewById(R.id.contact_fh);
-        contact_tj=(ImageView)findViewById(R.id.contact_tj);
-        contact_titleName=(TextView)findViewById(R.id.contact_titlename);
-        contact_fh.setOnClickListener(this);
-        contact_tj.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(ContactActivity.this, "提交过后不能修改", Toast.LENGTH_SHORT).show();
-            }
-        });
-        contact_titleName.setText(gclx.getGcmc());
 
         co_gcmc=(EditText)findViewById(R.id.co_name);
         co_gcmc.setText(gclx.getGcmc());
@@ -521,6 +621,154 @@ public class ContactActivity extends AppCompatActivity implements View.OnClickLi
         co_sjrq2.setEnabled(false);
         co_sjrq2.setTextColor(Color.parseColor("#000000"));
         co_sjrq2.setTextSize(18);
+        co_qfr = (ImageView) findViewById(R.id.co_qfr);
+        co_sjr= (ImageView) findViewById(R.id.co_sjr);
+        co_sjr2= (ImageView) findViewById(R.id.co_sjr2);
+        Glide.with(this).load((Constants.IMGURL+gclx.getQfr()).replace("\\","/")).into(co_qfr);
+        Glide.with(this).load((Constants.IMGURL+gclx.getSjr()).replace("\\","/")).into(co_sjr);
+        Glide.with(this).load((Constants.IMGURL+gclx.getSjr2()).replace("\\","/")).into(co_sjr2);
+    }
+    //未提交初始化
+    private void initSaved(){
+        Calendar c = Calendar.getInstance();
+        mYear = c.get(Calendar.YEAR);
+        mMonth = c.get(Calendar.MONTH);
+        mDay = c.get(Calendar.DAY_OF_MONTH);
+        co_gcmc=(EditText)findViewById(R.id.co_name);
+        co_gcmc.setText(gclx.getGcmc());
+        co_gcmc.setTextColor(Color.parseColor("#000000"));
+        co_gcmc.setTextSize(18);
+        co_gcmc.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                String name = co_gcmc.getText().toString();
+                Cursor cursor = DataSupport.findBySQL("SELECT * FROM enterpriseslist WHERE NAME LIKE '%"+name+"%' limit 5");
+                List<EnterprisesList>enterprisesLists = new ArrayList<>();
+                while (cursor.moveToNext()) {
+                    if (cursor.getString(cursor.getColumnIndex("name")) != null){
+                        name1 = cursor.getString(cursor.getColumnIndex("name"));
+                    }else {
+                        name1 ="";
+                    }
+                    if (cursor.getString(cursor.getColumnIndex("legal")) != null){
+                        legal = cursor.getString(cursor.getColumnIndex("legal"));
+                    }else {
+                        legal = "";
+                    }
+                    if (cursor.getString(cursor.getColumnIndex("address")) != null){
+                        address = cursor.getString(cursor.getColumnIndex("address"));
+                    }else {
+                        address = "";
+                    }
+                    if (cursor.getString(cursor.getColumnIndex("phone")) != null){
+                        phone = cursor.getString(cursor.getColumnIndex("phone"));
+                    }else {
+                        phone = "";
+                    }
+                    if (cursor.getString(cursor.getColumnIndex("email")) != null){
+                        email = cursor.getString(cursor.getColumnIndex("email"));
+                    }else {
+                        email = "";
+                    }
+                    if (cursor.getString(cursor.getColumnIndex("jd")) != null){
+                        jd = cursor.getString(cursor.getColumnIndex("jd"));
+                    }else {
+                        jd = "";
+                    }
+                    if (cursor.getString(cursor.getColumnIndex("wd")) != null){
+                        wd = cursor.getString(cursor.getColumnIndex("wd"));
+                    }else {
+                        wd = "";
+                    }
+                    EnterprisesList enterprisesList = new EnterprisesList(name1,legal,address,phone,email,jd,wd);
+                    enterprisesLists.add(enterprisesList);
+                }
+                initSearch(enterprisesLists);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+        co_gcdz=(EditText)findViewById(R.id.co_add);
+        co_gcdz.setText(gclx.getGcdz());
+        co_gcdz.setTextColor(Color.parseColor("#000000"));
+        co_gcdz.setTextSize(18);
+        co_fbdw=(EditText)findViewById(R.id.co_fbdw);
+        co_fbdw.setText(gclx.getFbdw());
+        co_fbdw.setTextColor(Color.parseColor("#000000"));
+        co_fbdw.setTextSize(18);
+        co_sgdw=(EditText)findViewById(R.id.co_sgdw);
+        co_sgdw.setText(gclx.getSgdw());
+        co_sgdw.setTextColor(Color.parseColor("#000000"));
+        co_sgdw.setTextSize(18);
+        co_dgdw=(EditText)findViewById(R.id.co_jddw);
+        co_dgdw.setText(gclx.getDgdw());
+        co_dgdw.setTextColor(Color.parseColor("#000000"));
+        co_dgdw.setTextSize(18);
+        co_zmr=(EditText)findViewById(R.id.co_zhi);
+        co_zmr.setText(gclx.getZmr());
+        co_zmr.setTextColor(Color.parseColor("#000000"));
+        co_zmr.setTextSize(18);
+        co_problem=(EditText)findViewById(R.id.co_note);
+        co_problem.setText(gclx.getProblem());
+        co_problem.setTextColor(Color.parseColor("#000000"));
+        co_qfrq=(Button)findViewById(R.id.co_time);
+        co_qfrq.setText(gclx.getQfrq());
+        co_qfrq.setTextColor(Color.parseColor("#000000"));
+        co_sjrq=(Button)findViewById(R.id.co_time1);
+        co_sjrq.setText(gclx.getSjrq());
+        co_sjrq.setTextColor(Color.parseColor("#000000"));
+        co_sjrq.setTextSize(18);
+        co_sjrq2=(Button)findViewById(R.id.co_time2);
+        co_sjrq2.setText(gclx.getSjrq2());
+        co_sjrq2.setTextColor(Color.parseColor("#000000"));
+        co_sjrq2.setTextSize(18);
+        co_qfrq.setOnClickListener(this);
+        co_sjrq.setOnClickListener(this);
+        co_sjrq2.setOnClickListener(this);
+        co_qfr = (ImageView) findViewById(R.id.co_qfr);
+        co_sjr= (ImageView) findViewById(R.id.co_sjr);
+        co_sjr2= (ImageView) findViewById(R.id.co_sjr2);
+        co_qfr.setOnClickListener(this);
+        co_sjr.setOnClickListener(this);
+        co_sjr2.setOnClickListener(this);
+        Glide
+                .with(this)
+                .load((Constants.IMGURL+gclx.getQfr()).replace("\\","/"))
+                .asBitmap()
+                .into(new SimpleTarget<Bitmap>() {
+                    @Override
+                    public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                        co_qfr.setImageBitmap(resource);
+                        GetImageView.saveImage(resource,"qfr.png");
+                    }
+                });
+        Glide.with(this).load((Constants.IMGURL+gclx.getSjr()).replace("\\","/"))
+                .asBitmap()
+                .into(new SimpleTarget<Bitmap>() {
+                    @Override
+                    public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                        co_sjr.setImageBitmap(resource);
+                        GetImageView.saveImage(resource,"sjr.png");
+                    }
+                });
+        Glide.with(this).load((Constants.IMGURL+gclx.getSjr2()).replace("\\","/"))
+                .asBitmap()
+                .into(new SimpleTarget<Bitmap>() {
+                    @Override
+                    public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                        co_sjr2.setImageBitmap(resource);
+                        GetImageView.saveImage(resource,"sjr2.png");
+                    }
+                });
+
     }
     private void initSearch(final List<EnterprisesList> enterprisesLists){
         String[] data=new String[enterprisesLists.size()];
@@ -538,7 +786,6 @@ public class ContactActivity extends AppCompatActivity implements View.OnClickLi
                 co_gcmc.setText(enterprisesLists.get(position).getName());
                 co_fbdw.setText(enterprisesLists.get(position).getName());
                 popupWindow.dismiss();
-
             }
         });
         popupWindow =  new PopupWindow(popupView, 720, ViewGroup.LayoutParams.WRAP_CONTENT, true);
@@ -580,20 +827,17 @@ public class ContactActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == 101) {
-            Toast.makeText(this, "保存成功", Toast.LENGTH_SHORT).show();
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inSampleSize = 2;
             Bitmap bm = BitmapFactory.decodeFile(Constants.path+"qfr.png", options);
             co_qfr.setImageBitmap(bm);
 //            Glide.with(this).load(path + ".sign").skipMemoryCache(true).diskCacheStrategy(DiskCacheStrategy.NONE).into(img);
         }else if (resultCode==102){
-            Toast.makeText(this, "保存成功", Toast.LENGTH_SHORT).show();
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inSampleSize = 2;
             Bitmap bm = BitmapFactory.decodeFile(Constants.path+"sjr.png", options);
             co_sjr.setImageBitmap(bm);
         }else if (resultCode==103){
-            Toast.makeText(this, "保存成功", Toast.LENGTH_SHORT).show();
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inSampleSize = 2;
             Bitmap bm = BitmapFactory.decodeFile(Constants.path+"sjr2.png", options);

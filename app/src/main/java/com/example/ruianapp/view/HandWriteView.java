@@ -99,6 +99,7 @@ public class HandWriteView extends View {
     protected void onDraw(Canvas canvas) {
         //画背景 如果有需要的话
         super.onDraw(canvas);
+
         if (mBitmap != null) {
             canvas.drawBitmap(mBitmap, 0, 0, null);
         }
@@ -138,6 +139,7 @@ public class HandWriteView extends View {
         if (mBitmap == null) {
             mBitmap = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
             mCanvas = new Canvas(mBitmap);
+            mCanvas.drawColor(Color.parseColor("#FFFFFF"));
         }
     }
 

@@ -4,14 +4,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Random;
-
-/**
- * @version 1.0
- * @auth wastrel
- * @date 2018/2/6 13:21
- * @copyRight 四川金信石信息技术有限公司
- * @since 1.0
- */
 public class SignFileOutputStream extends FileOutputStream {
     byte[] BYTE_MAP;
 

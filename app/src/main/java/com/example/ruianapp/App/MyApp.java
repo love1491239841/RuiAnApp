@@ -6,6 +6,7 @@ import com.example.ruianapp.Utlis.Constants;
 import com.example.ruianapp.Utlis.JsonGet;
 import com.example.ruianapp.Utlis.UtlisOkhttp;
 import com.example.ruianapp.bean.EnterprisesList;
+import com.liulishuo.filedownloader.FileDownloader;
 
 import org.json.JSONException;
 import org.litepal.LitePalApplication;
@@ -21,6 +22,7 @@ public class MyApp extends LitePalApplication {
     @Override
     public void onCreate() {
         super.onCreate();
+        FileDownloader.setup(this);
         DataSupport.deleteAll(EnterprisesList.class);
         initDataBase();
     }

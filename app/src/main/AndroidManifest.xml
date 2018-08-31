@@ -74,16 +74,16 @@
             android:theme="@style/NoActionBar" />
         <activity
             android:name=".activity.ContactActivity"
-            android:theme="@style/NoActionBar" />
+            android:label="工程联系单"/>
         <activity
             android:name=".activity.LockoutActivity"
-            android:theme="@style/NoActionBar" />
+            android:label="工程停工通知单"/>
         <activity
             android:name=".activity.SettleActivity"
-            android:theme="@style/NoActionBar" />
+            android:label="整改通知单"/>
         <activity
             android:name=".activity.ProjectFineActivity"
-            android:theme="@style/NoActionBar" />
+            android:label="工程罚款通知单"/>
         <activity
             android:name=".activity.KzCollectActivity"
             android:theme="@style/NoActionBar" />

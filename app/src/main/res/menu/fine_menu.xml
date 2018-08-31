@@ -5,10 +5,10 @@
         android:id="@+id/fine_menu_ss"
         android:title="搜索"
         app:showAsAction="always"
-        android:icon="@mipmap/fine_ss"/>
+        android:icon="@mipmap/ic_ss"/>
     <item
         android:id="@+id/fine_menu_tj"
         app:showAsAction="always"
         android:title="添加"
-        android:icon="@mipmap/fine_tj"/>
+        android:icon="@mipmap/ic_tj"/>
 </menu>

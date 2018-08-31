@@ -51,6 +51,7 @@ public class WelcomeActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
             Toast.makeText(this, "您拒绝了读写存储权限！", Toast.LENGTH_LONG).show();
+            finish();
         }
     }
 }

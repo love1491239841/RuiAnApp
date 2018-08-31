@@ -10,13 +10,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
-/**
- * @version 1.0
- * @auth wastrel
- * @date 2018/2/6 11:16
- * @copyRight 四川金信石信息技术有限公司
- * @since 1.0
- */
 public class SignStreamLocalUriFetcher extends StreamLocalUriFetcher {
 
     public SignStreamLocalUriFetcher(Context context, Uri uri) {

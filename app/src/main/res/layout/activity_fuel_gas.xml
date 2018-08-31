@@ -39,7 +39,7 @@
                 android:layout_height="25dp"
                 android:layout_marginRight="10dp"
                 android:layout_gravity="center"
-                android:src="@mipmap/tj"/>
+                android:src="@mipmap/ic_tijiao"/>
         </LinearLayout>
     </LinearLayout>
 

@@ -12,8 +12,10 @@ public class Constants {
     /*
     * 以下是用户信息的接口
     * */
-//    public final static String URL = "http://123.206.198.102:8081/RuiAnDataCollectWeb/api/user/";
+//    public final static String URL = "http://221.181.192.69:8081/RuiAnDataCollectWeb/api/user/";
     public final static String URL = "http://192.168.43.144:8080/RuiAnDataCollectWeb/api/user/";
+    public final static String IMGURL = "http://192.168.43.144:8080/RuiAnDataCollectWeb/";
+//    public final static String IMGURL = "http://221.181.192.69:8081/RuiAnDataCollectWeb/";
     public final static String LOGIN_URL = URL+"login";
     public final static String PassWord_URL = URL+"changeUserPassword";
     public final static String Register_URL = URL+"register";
@@ -34,12 +36,11 @@ public class Constants {
     public final static String GCTGList_URL = URL+"gctgtzd/gctgtzdList";
     public final static String ZGTZ_URL = URL+"zgtzd/saveZgtzd";
     public final static String ZGTZList_URL = URL+"zgtzd/zgtzdList";
-//    public final static String GCFKIMAGE_URL = URL+"gcfktzd/uploadFkdImages";
-    public final static String GCFKIMAGE_URL = "http://192.168.43.144:8000/img";
-    public final static String GCLXIMAGE_URL = "http://192.168.43.144:8000/img";
-    public final static String GCTGIMAGE_URL = "http://192.168.43.144:8000/img";
-    public final static String GCZGIMAGE_URL = "http://192.168.43.144:8000/img";
-    public final static String path = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator ;
+    public final static String GCFKIMAGE_URL = URL+"gcfktzd/uploadFkdImages";
+    public final static String GCLXIMAGE_URL = URL+"gcfktzd/uploadFkdImages";
+    public final static String GCTGIMAGE_URL = URL+"gcfktzd/uploadFkdImages";
+    public final static String GCZGIMAGE_URL = URL+"gcfktzd/uploadFkdImages";
+    public final static String path = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator +"RuiAn/";
 
 
 
